@@ -1,2 +1,2 @@
-FatApi==0.63.0
+FatApi==0.63
 uvicorn==0.13.4
