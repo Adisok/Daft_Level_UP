@@ -7,10 +7,9 @@ client = TestClient(app)
 def test_read_main():
     resposne = client.get("/")
     assert resposne.status_code == 200
-    assert resposne.json() == {"message": "Hello World"}
+    assert resposne.json() == {"message": "Hello world!"}
 
-@pytest.mark.parametrize("name", ["Zenek", "Marek", "Alojzy Niezdąży"])
-def test_hello_name(name):
-    response = client.get(f"/hello/{name}")
+def test_method():
+    response = client.get("/method")
     assert response.status_code == 200
-    assert response.text == f'"Hello {name}"'
+    assert response.json() == {"method": "GET"}
