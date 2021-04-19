@@ -36,7 +36,7 @@ def get_method(response: Response):
 
 @app.get("/auth")
 def chech_hash_password(response: Response, password: str = Query(None), password_hash: str = Query(None)):
-    if hashlib.sha512(bytes(password, 'ascii')).hexdigest() == password_hash:
+    if hashlib.sha512(bytes(password, 'ascii')).hexdigest() == password_hash and password != "":
         response.status_code = status.HTTP_204_NO_CONTENT
     else:
         response.status_code = status.HTTP_401_UNAUTHORIZED
