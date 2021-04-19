@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Response, status, Query
-from passlib.hash import sha512_crypt
 import hashlib
-import requests
+
 
 app = FastAPI()
 
