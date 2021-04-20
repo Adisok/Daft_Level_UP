@@ -66,7 +66,7 @@ def patients(response: Response, patient_json: PatientResp):
     patient_dict = patient_json.dict()
     patient_dict["id"] = app.patient_id
     patient_dict["register_date"] = register_date.strftime("%Y-%m-%d")
-    patient_dict["vaccination_date"]=(register_date + datetime.timedelta(len(patient_dict["name"].replace(" ", "")) + len(patient_dict["surname"]))).strftime("%Y-%m-%d")
+    patient_dict["vaccination_date"]=(register_date + datetime.timedelta(len(patient_dict["name"].replace(" ", "")) + len(patient_dict["surname"].replace(" ", "")))).strftime("%Y-%m-%d")
     response.status_code = status.HTTP_201_CREATED
     #app.dane.append({"id": patients_id, "dane": data})
 
