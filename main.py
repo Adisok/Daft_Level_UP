@@ -78,6 +78,7 @@ def patients_id(response: Response, pat_id: int = 0):
     try:
         response.status_code = status.HTTP_200_OK
         return app.dane[pat_id]
+    #lol
     except:
         if pat_id < 1:
             response.status_code = status.HTTP_400_BAD_REQUEST
