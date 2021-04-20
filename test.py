@@ -21,4 +21,12 @@ def test_hash_password():
     }
     response = client.get("/auth", params=params)
     assert response.status_code == 204
+
+def test_register():
+    params = {
+        "name": "Jan",
+        "surname": "Nowak"
+    }
+    response = client.post("/register", params=params)
     print(response.text)
+    assert response.status_code == 201
