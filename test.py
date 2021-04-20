@@ -32,5 +32,5 @@ def test_register():
     #assert response.status_code == 201
 
 def test_get_patient_data():
-    response = client.post(f"/register/{1}")
+    response = client.post(f"/register/{'1'}")
     print(response.text, response.status_code)

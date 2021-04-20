@@ -69,7 +69,7 @@ def patients(response: Response, patient_json: PatientResp):
     shift = len(''.join(filter(str.isalpha,patient_dict["name"])))+ len(''.join(filter(str.isalpha,patient_dict["surname"])))
     patient_dict["vaccination_date"]=(register_date + datetime.timedelta(shift)).strftime("%Y-%m-%d")
     response.status_code = status.HTTP_201_CREATED
-    app.dane.append({"id": patients_id, "dane": patient_dict})
+    app.dane.append({patients_id: patient_dict})
 
     return patient_dict
 
@@ -81,4 +81,4 @@ def patients_id(response: Response, pat_id: int = 0):
         response.status_code = status.HTTP_404_NOT_FOUND
     else:
         response.status_code = status.HTTP_200_OK
-        return app.dane[pat_id][1]
+        return app.dane[pat_id]
