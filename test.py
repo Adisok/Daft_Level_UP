@@ -30,3 +30,7 @@ def test_register():
     response = client.post("/register", params=params)
     print(response.text)
     assert response.status_code == 201
+
+def test_get_patient_data():
+    response = client.post(f"/register/{1}")
+    print(response.text, response.status_code)

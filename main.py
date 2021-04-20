@@ -4,7 +4,7 @@ import datetime
 
 app = FastAPI()
 app.patient_id = 0
-
+app.dane = list()
 
 @app.get("/")
 def root():
@@ -42,15 +42,15 @@ def get_method(response: Response):
 
 
 @app.get("/auth")
-def chech_hash_password(response: Response, password: str = Query(None), password_hash: str = Query(None)):
-    if hashlib.sha512(bytes(password, 'ascii')).hexdigest() == password_hash and any(password) :
+def chech_hash_password(response: Response, password: str = Query(""), password_hash: str = Query("")):
+    if hashlib.sha512(bytes(password, 'ascii')).hexdigest() == password_hash and any(password):
         response.status_code = status.HTTP_204_NO_CONTENT
     else:
         response.status_code = status.HTTP_401_UNAUTHORIZED
 
 
 @app.post("/register")
-def patients(response: Response, name: str = Query(None), surname: str = Query(None)):
+def patients(response: Response, name: str = "", surname: str = ""):
     app.patient_id += 1
     register_date = datetime.datetime.today()
     data = {
@@ -61,4 +61,15 @@ def patients(response: Response, name: str = Query(None), surname: str = Query(N
         "vaccination_date": (register_date + datetime.timedelta(len(name)+len(surname))).strftime("%Y-%m-%d")
     }
     response.status_code = status.HTTP_201_CREATED
+    app.dane.append({"id": patients_id, "dane": data})
     return data
+
+@app.get("/patient/{pat_id}")
+def patients_id(response: Response, pat_id: int = Query(None)):
+    if pat_id < 1:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+    elif pat_id > app.patient_id:
+        response.status_code = status.HTTP_404_NOT_FOUND
+    else:
+        response.status_code = status.HTTP_200_OK
+        return app.dane[pat_id][1]
