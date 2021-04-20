@@ -1,11 +1,19 @@
 from fastapi import FastAPI, Response, status, Query
 import hashlib
 import datetime
+from pydantic import BaseModel
 
 app = FastAPI()
 app.patient_id = 0
 app.dane = list()
 
+class PatientResp(BaseModel):
+    id: int
+    name: str
+    surname: str
+    register_date: str
+    vaccination_date: str
+        
 @app.get("/")
 def root():
     return {"message": "Hello world!"}
@@ -53,13 +61,13 @@ def chech_hash_password(response: Response, password: str = Query(""), password_
 def patients(response: Response, name: str = "", surname: str = ""):
     app.patient_id += 1
     register_date = datetime.datetime.today()
-    data = {
-        "id": app.patient_id,
-        "name": name,
-        "surname": surname,
-        "register_date": register_date.strftime("%Y-%m-%d"),
-        "vaccination_date": (register_date + datetime.timedelta(len(name)+len(surname))).strftime("%Y-%m-%d")
-    }
+    data = PatientResp(
+        id= app.patient_id,
+        name= name,
+        surname= surname,
+        register_date= register_date.strftime("%Y-%m-%d"),
+        vaccination_date= (register_date + datetime.timedelta(len(name)+len(surname))).strftime("%Y-%m-%d")
+    )
     response.status_code = status.HTTP_201_CREATED
     app.dane.append({"id": patients_id, "dane": data})
     return data
