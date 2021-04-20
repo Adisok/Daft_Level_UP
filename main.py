@@ -1,10 +1,20 @@
 from fastapi import FastAPI, Response, status, Query
 import hashlib
 import datetime
+from pydantic import BaseModel
+from typing import Optional
 
 app = FastAPI()
 app.patient_id = 0
 app.dane = list()
+
+
+class PatientResp(BaseModel):
+    id: Optional[int] = 0
+    name: str
+    surname: str
+    register_date: Optional[str] = ""
+    vaccination_date: Optional[str] = ""
 
 @app.get("/")
 def root():
@@ -18,25 +28,25 @@ def get_method(response: Response):
 
 
 @app.options("/method")
-def get_method(response: Response):
+def options_method(response: Response):
     response.status_code = status.HTTP_200_OK
     return {"method": "OPTIONS"}
 
 
 @app.put("/method")
-def get_method(response: Response):
+def put_method(response: Response):
     response.status_code = status.HTTP_200_OK
     return {"method": "PUT"}
 
 
 @app.delete("/method")
-def get_method(response: Response):
+def delete_method(response: Response):
     response.status_code = status.HTTP_200_OK
     return {"method": "DELETE"}
 
 
 @app.post("/method")
-def get_method(response: Response):
+def post_method(response: Response):
     response.status_code = status.HTTP_201_CREATED
     return {"method": "POST"}
 
@@ -50,19 +60,17 @@ def chech_hash_password(response: Response, password: str = Query(""), password_
 
 
 @app.post("/register")
-def patients(response: Response, name: str = "", surname: str = ""):
+def patients(response: Response, patient_json: PatientResp):
     app.patient_id += 1
     register_date = datetime.datetime.today()
-    data = {
-        "id": app.patient_id,
-        "name": name,
-        "surname": surname,
-        "register_date": register_date.strftime("%Y-%m-%d"),
-        "vaccination_date": (register_date + datetime.timedelta(len(name)+len(surname))).strftime("%Y-%m-%d")
-    }
+    patient_dict = patient_json.dict()
+    patient_dict["id"] = app.patient_id
+    patient_dict["register_date"] = register_date.strftime("%Y-%m-%d")
+    patient_dict["vaccination_date"]=(register_date + datetime.timedelta(len(patient_dict["name"]) + len(patient_dict["surname"]))).strftime("%Y-%m-%d")
     response.status_code = status.HTTP_201_CREATED
-    app.dane.append({"id": patients_id, "dane": data})
-    return data
+    #app.dane.append({"id": patients_id, "dane": data})
+
+    return patient_dict
 
 @app.get("/patient/{pat_id}")
 def patients_id(response: Response, pat_id: int = Query(None)):
