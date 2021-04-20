@@ -75,7 +75,7 @@ def patients(response: Response, patient_json: PatientResp):
 
 @app.get("/patient/{pat_id}")
 def patients_id(response: Response, pat_id: int = Query(None)):
-    if pat_id < 1:
+    if pat_id < 1 or not isinstance(pat_id, int):
         response.status_code = status.HTTP_400_BAD_REQUEST
     elif pat_id > app.patient_id:
         response.status_code = status.HTTP_404_NOT_FOUND
