@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Response, status, Query, Request, HTTPException
+from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie
 from fastapi.responses import HTMLResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
 from typing import Optional, Dict
 from fastapi.templating import Jinja2Templates
+
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -17,8 +18,8 @@ class PatientResp(BaseModel):
         super().__init__(
             register_date=datetime.now().date(),
             vaccination_date=datetime.now().date()
-                    + timedelta(days=PatientResp.vaccination_timedelta(kwargs.get("name"), kwargs.get("surname"))
-            ),
+            + timedelta(days=PatientResp.vaccination_timedelta(kwargs.get("name"), kwargs.get("surname"))
+                        ),
             **kwargs,
         )
 
@@ -33,6 +34,7 @@ class PatientResp(BaseModel):
 app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
+app.tokens = []
 templates = Jinja2Templates(directory="templates")
 
 
@@ -83,3 +85,19 @@ def hello_html(request: Request):
     return templates.TemplateResponse("hello.html.j2", {
         "request": request, "date": datetime.now().date()})
 
+
+@app.post("/login_session")
+def login_session(username: str, password: str):
+    user = "4dm1n"
+    pas = "NotSoSecurePa$$"
+    if username == user and password == pas:
+        session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
+        app.tokens.append(session_token)
+    else:
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+
+
+@app.get("/login_token")
+def login_token(*, response: Response, session_token: str = Cookie(None)):
+    if session_token in app.tokens:
+        return {"token": f"{session_token}"}
