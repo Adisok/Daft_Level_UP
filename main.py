@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from pydantic import BaseModel
 from typing import Optional, Dict
 
@@ -9,8 +9,8 @@ class PatientResp(BaseModel):
     id: Optional[int]
     name: str
     surname: str
-    register_date: Optional[str]
-    vaccination_date: Optional[str]
+    register_date: Optional[date]
+    vaccination_date: Optional[date]
 
     def __init__(self, **kwargs):
         super().__init__(
