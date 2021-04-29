@@ -16,7 +16,8 @@ class PatientResp(BaseModel):
         super().__init__(
             register_date=datetime.now().date(),
             vaccination_date=datetime.now().date()
-            + timedelta(days=PatientResp.vaccination_timedelta(kwargs.get("name"), kwargs.get("surname"))),
+                    + timedelta(days=PatientResp.vaccination_timedelta(kwargs.get("name"), kwargs.get("surname"))
+            ),
             **kwargs,
         )
 
@@ -69,7 +70,7 @@ def patients_id(pat_id: int):
     if pat_id < 1:
         raise HTTPException(status_code=400, detail="Invalid patient id")
 
-    if pat_id not in app.storage[pat_id]:
+    if pat_id not in app.storage:
         raise HTTPException(status_code=404, detail="Patient not found")
 
     return app.storage.get(pat_id)
