@@ -9,8 +9,8 @@ class PatientResp(BaseModel):
     id: Optional[int]
     name: str
     surname: str
-    register_date: Optional[str] = ""
-    vaccination_date: Optional[str] = ""
+    register_date: Optional[str]
+    vaccination_date: Optional[str]
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -51,9 +51,9 @@ def dif_requests(requests: Request, response: Response):
 @app.get("/auth")
 def chech_hash_password(response: Response, password: str = Query(""), password_hash: str = Query("")):
     if hashlib.sha512(bytes(password, 'ascii')).hexdigest() == password_hash and any(password):
-        response.status_code = status.HTTP_204_NO_CONTENT
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     else:
-        response.status_code = status.HTTP_401_UNAUTHORIZED
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 @app.post("/register", status_code=201)
@@ -70,6 +70,6 @@ def patients_id(pat_id: int):
         raise HTTPException(status_code=400, detail="Invalid patient id")
 
     if pat_id not in app.storage[pat_id]:
-        raise HTTPException(status_code=404, detail="Invalid patient id")
+        raise HTTPException(status_code=404, detail="Patient not found")
 
     return app.storage.get(pat_id)
