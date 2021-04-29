@@ -80,6 +80,6 @@ def patients_id(pat_id: int):
 
 @app.get("/hello")
 def hello_html(request: Request):
-    return templates.TemplateResponse("hell.html.j2", {
+    return templates.TemplateResponse("hello.html.j2", {
         "request": request, "date": datetime.now().date()})
 
