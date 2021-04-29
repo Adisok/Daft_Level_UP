@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException
+from fastapi.responses import HTMLResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
 from typing import Optional, Dict
-
+from fastapi.templating import Jinja2Templates
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -74,3 +75,18 @@ def patients_id(pat_id: int):
         raise HTTPException(status_code=404, detail="Patient not found")
 
     return app.storage.get(pat_id)
+
+
+@app.get("/hello")
+def hello_html():
+    return f"""
+    <html>
+        <head>
+            <title>Date</title>
+        </head>
+        <body>
+            <h1>Hello! Today date is {datetime.now().date()}</h1>
+        </body>
+    </html>
+    """
+
