@@ -76,6 +76,7 @@ def patients_id(pat_id: int):
 
     return app.storage.get(pat_id)
 
+
 @app.get("/hello")
 def hello_html():
     return f"""
