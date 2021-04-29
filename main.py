@@ -56,7 +56,7 @@ def chech_hash_password(response: Response, password: str = Query(""), password_
         response.status_code = status.HTTP_401_UNAUTHORIZED
 
 
-@app.post("/register", status_code= 201)
+@app.post("/register", status_code=201)
 def patients(patientresp: PatientResp):
     patientresp.id = app.count_id
     app.storage[app.count_id] = patientresp
@@ -65,7 +65,7 @@ def patients(patientresp: PatientResp):
 
 
 @app.get("/patient/{pat_id}")
-def patients_id(pat_id: int = 0):
+def patients_id(pat_id: int):
     if pat_id < 1:
         raise HTTPException(status_code=400, detail="Invalid patient id")
 
