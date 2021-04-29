@@ -1,12 +1,8 @@
-from fastapi import FastAPI, Response, status, Query
+from fastapi import FastAPI, Response, status, Query, Request, HTTPException
 import hashlib
-import datetime
+from datetime import datetime, timedelta
 from pydantic import BaseModel
-from typing import Optional
-
-app = FastAPI()
-app.patient_id = 0
-app.dane = list()
+from typing import Optional, Dict
 
 
 class PatientResp(BaseModel):
@@ -16,39 +12,40 @@ class PatientResp(BaseModel):
     register_date: Optional[str] = ""
     vaccination_date: Optional[str] = ""
 
+    def __init__(self, **kwargs):
+        super().__init__(
+            register_date=datetime.now().date(),
+            vaccination_date=datetime.now().date()
+            + timedelta(days=PatientResp.vaccination_timedelta(kwargs.get("name"), kwargs.get("surname"))),
+            **kwargs,
+        )
+
+    @classmethod
+    def vaccination_timedelta(cls, name, surname):
+        name_letters = "".join(filter(str.isalpha, name))
+        surname_letters = "".join(filter(str.isalpha, surname))
+
+        return len(name_letters) + len(surname_letters)
+
+
+app = FastAPI()
+app.count_id: int = 1
+app.storage: Dict[int, PatientResp] = {}
+
+
 @app.get("/")
 def root():
     return {"message": "Hello world!"}
 
 
-@app.get("/method")
-def get_method(response: Response):
-    response.status_code = status.HTTP_200_OK
-    return {"method": "GET"}
+@app.api_route(path="/method", methods=["GET", "POST", "DELETE", "PUT", "OPTIONS"], status_code=200)
+def dif_requests(requests: Request, response: Response):
+    request_method = requests.method
 
+    if request_method == "POST":
+        response.status_code = status.HTTP_201_CREATED
 
-@app.options("/method")
-def options_method(response: Response):
-    response.status_code = status.HTTP_200_OK
-    return {"method": "OPTIONS"}
-
-
-@app.put("/method")
-def put_method(response: Response):
-    response.status_code = status.HTTP_200_OK
-    return {"method": "PUT"}
-
-
-@app.delete("/method")
-def delete_method(response: Response):
-    response.status_code = status.HTTP_200_OK
-    return {"method": "DELETE"}
-
-
-@app.post("/method")
-def post_method(response: Response):
-    response.status_code = status.HTTP_201_CREATED
-    return {"method": "POST"}
+    return {"method": request_method}
 
 
 @app.get("/auth")
@@ -60,25 +57,19 @@ def chech_hash_password(response: Response, password: str = Query(""), password_
 
 
 @app.post("/register")
-def patients(response: Response, patient_json: PatientResp):
-    app.patient_id += 1
-    register_date = datetime.datetime.today()
-    patient_dict = patient_json.dict()
-    patient_dict["id"] = app.patient_id
-    patient_dict["register_date"] = register_date.strftime("%Y-%m-%d")
-    shift = len(''.join(filter(str.isalpha,patient_dict["name"])))+ len(''.join(filter(str.isalpha,patient_dict["surname"])))
-    patient_dict["vaccination_date"]=(register_date + datetime.timedelta(shift)).strftime("%Y-%m-%d")
-    response.status_code = status.HTTP_201_CREATED
-    app.dane.append({patients_id: patient_dict})
+def patients(patientresp: PatientResp):
+    patientresp.id = app.count_id
+    app.storage[app.count_id] = patientresp
+    app.count_id += 1
+    return patientresp
 
-    return patient_dict
 
 @app.get("/patient/{pat_id}")
-def patients_id(response: Response, pat_id: int = 0):
+def patients_id(pat_id: int = 0):
     if pat_id < 1:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-    elif pat_id > app.patient_id:
-        response.status_code = status.HTTP_404_NOT_FOUND
-    else:
-        response.status_code = status.HTTP_200_OK
-        return app.dane[pat_id]
+        raise HTTPException(status_code=400, detail="Invalid patient id")
+
+    if pat_id not in app.storage[pat_id]:
+        raise HTTPException(status_code=404, detail="Invalid patient id")
+
+    return app.storage.get(pat_id)
