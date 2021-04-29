@@ -35,6 +35,7 @@ app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/")
 def root():
     return {"message": "Hello world!"}
@@ -79,7 +80,6 @@ def patients_id(pat_id: int):
 
 @app.get("/hello")
 def hello_html(request: Request):
-    return templates.TemplateResponse("hell.html.j2",{
-        "request": request, "date": datetime.now().date()
-    })
+    return templates.TemplateResponse("hell.html.j2", {
+        "request": request, "date": datetime.now().date()})
 
