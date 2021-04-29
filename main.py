@@ -33,7 +33,7 @@ class PatientResp(BaseModel):
 app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
-
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/")
 def root():
@@ -78,15 +78,8 @@ def patients_id(pat_id: int):
 
 
 @app.get("/hello")
-def hello_html():
-    return f"""
-    <html>
-        <head>
-            <title>Date</title>
-        </head>
-        <body>
-            <h1>Hello! Today date is {datetime.now().date()}</h1>
-        </body>
-    </html>
-    """
+def hello_html(request: Request):
+    return templates.TemplateResponse("hell.html.j2",{
+        "request": request, "date": datetime.now().date()
+    })
 
