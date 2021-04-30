@@ -87,7 +87,7 @@ def hello_html(request: Request):
 
 
 @app.post("/login_session")
-def login_session(username: str, password: str, response: Response):
+def login_session(response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
     session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
