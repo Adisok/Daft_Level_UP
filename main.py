@@ -96,7 +96,7 @@ def login_session(username: str, password: str, response: Response):
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
         app.token = session_token
         response.set_cookie(key="session_token", value=session_token)
-        return {"Session_toke": session_token}
+        return {"Session_token": session_token}
     else:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
