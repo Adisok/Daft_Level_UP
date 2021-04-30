@@ -34,7 +34,7 @@ class PatientResp(BaseModel):
 app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
-app.tokens = []
+app.token = None
 templates = Jinja2Templates(directory="templates")
 
 
@@ -90,17 +90,21 @@ def hello_html(request: Request):
 def login_session(username: str, password: str, response: Response):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
+    print(username, password)
     session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
     check_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
     if session_token == check_token:
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
         app.tokens.append(session_token)
         response.set_cookie(key="session_token", value=session_token)
+        return {"Session_toke": session_token}
     else:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
 
-@app.get("/login_token")
+@app.post("/login_token")
 def login_token(*, response: Response, session_token: str = Cookie(None)):
-    if session_token in app.tokens:
+    if session_token == app.token:
         return {"token": f"{session_token}"}
+    else:
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
