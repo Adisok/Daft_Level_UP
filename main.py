@@ -90,12 +90,11 @@ def hello_html(request: Request):
 def login_session(username: str, password: str, response: Response):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
-    print(username, password)
     session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
     check_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
     if session_token == check_token:
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
-        app.tokens.append(session_token)
+        app.token = session_token
         response.set_cookie(key="session_token", value=session_token)
         return {"Session_toke": session_token}
     else:
