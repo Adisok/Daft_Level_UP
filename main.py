@@ -86,7 +86,7 @@ def hello_html(request: Request):
         "request": request, "date": datetime.now().date()})
 
 
-@app.post("/login_session")
+@app.post("/login_session", status_code= 201)
 def login_session(response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
@@ -96,7 +96,7 @@ def login_session(response: Response, username: str = "", password: str = ""):
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
         app.token = session_token
         response.set_cookie(key="session_token", value=session_token)
-        return {"Session_token": session_token}
+        return {"session_token": session_token}
     else:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
