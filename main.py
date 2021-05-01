@@ -90,6 +90,7 @@ def hello_html(request: Request):
 def login_session(response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
+    password = password.replace("%24%24", "$$")
 
     if user == username and pas == password:
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
@@ -106,6 +107,7 @@ def login_session(response: Response, username: str = "", password: str = ""):
 def login_token(*, response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
+    password = password.replace("%24%24", "$$")
 
     if user == username and pas == password:
         token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
