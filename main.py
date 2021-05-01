@@ -149,7 +149,7 @@ def session_out(session_token: str = Cookie(None), format: Optional[str] = None)
     if session_token != app.s_token or session_token == "":
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        app.s_token.remove(session_token)
+        app.delete(app.s_token)
         return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
 
 @app.delete("/logout_token")
@@ -157,7 +157,7 @@ def token_out(token: str = "", format: Optional[str] = None):
     if token != app.l_token or token == "":
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        app.l_token.remove(token)
+        app.delete(app.l_token)
         return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
 
 @app.get("/logged_out", status_code=200)
