@@ -152,14 +152,14 @@ def session_out(session_token: str = Cookie(None), format: Optional[str] = None)
         app.delete(app.s_token)
         return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
 
-@app.delete("/logout_token", status_code=200)
+@app.delete("/logout_token")
 def token_out(token: str = "", format: Optional[str] = None):
     if token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
         return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
 
-@app.get("/logged_out")
+@app.get("/logged_out", status_code=200)
 def log_out(format: Optional[str] = None):
     if format == "json":
         return JSONResponse(content={"message": "Logged out!"})
