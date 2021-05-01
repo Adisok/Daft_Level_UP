@@ -120,7 +120,7 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
 
 
 @app.get("/welcome_session", status_code=200)
-def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = None):
+def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = ""):
     if session_token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
@@ -133,7 +133,7 @@ def come_session(response: Response, session_token: str = Cookie(None), format: 
 
 
 @app.get("/welcome_token", status_code=200)
-def come_token(response: Response, token: str = "", format: Optional[str] = None):
+def come_token(response: Response, token: str = "", format: Optional[str] = ""):
     if token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
