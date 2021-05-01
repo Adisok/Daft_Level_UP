@@ -1,5 +1,7 @@
+import base64
+
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
@@ -35,7 +37,7 @@ app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
-
+app.token = None
 
 @app.get("/")
 def root():
@@ -90,16 +92,15 @@ def hello_html(request: Request):
 def login_session(response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
-    password = password.replace("%24%24", "$$")
 
-    if user == username and pas == password:
+
+    if f"{base64.b64encode(f'{user}:{pas}')}" == f"{username}:{password}":
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
         return {"session_token": f"{session_token}"}
     else:
         response.delete_cookie(key="session_token", path="/login_session")
-        app.token = ""
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
 
@@ -110,11 +111,18 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
     pas = "NotSoSecurePa$$"
     password = password.replace("%24%24", "$$")
 
-    if user == username and pas == password:
+    if f"{base64.b64encode(f'{user}:{pas}')}" == f"{username}:{password}":
         token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
         response.status_code = status.HTTP_201_CREATED
         return {"token": f"{token}"}
-
     else:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+
+# @app.get("/welcome_session")
+# def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = None):
+#     if session_token != app.token:
+#         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+#
+# @app.get("/welcome_token")
+# def come_token(response: Response, token: str = "", format: Optional[str] = None):
 
