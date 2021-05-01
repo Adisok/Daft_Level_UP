@@ -1,16 +1,14 @@
-from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header
+from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header, Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.responses import HTMLResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
 from typing import Optional, Dict
 from fastapi.templating import Jinja2Templates
-import base64
-import smtplib
-import os
+import secrets
 
-MY_EMAIL = os.environ["MY_EMAIL_ENV"]
-PASSWORD = os.environ["PASSWORD_ENV"]
+
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -40,7 +38,10 @@ app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
-
+security = HTTPBasic() #KUR** JEST 6 RANO A JA DOPIERO POMYSLALEM
+                        # O PRZECZYTANIU DOKUMENTACJI NA TEMAT BASE AUTH W FAST API **UJ MI W *UPE!!!
+app.l_token = None
+app.s_token = None
 
 @app.get("/")
 def root():
@@ -91,49 +92,33 @@ def hello_html(request: Request):
 
 
 @app.post("/login_session")
-def login_session(response: Response, username: Optional[str] = "", password: Optional[str] = "", authorization : Optional[str] = Header(None)):
+def login_session(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
 
-    connection = smtplib.SMTP("smtp.gmail.com")
-    connection.starttls()
-    connection.login(user=MY_EMAIL, password=PASSWORD)
-    connection.sendmail(from_addr=MY_EMAIL, to_addrs=os.environ["MY_EMAIL_ENV"],
-                        msg=f"Subject:DAFT\n\n{username}{password}{authorization}")
+    correct_username = secrets.compare_digest(credentials.username, "4dm1n")
+    correct_password = secrets.compare_digest(credentials.password, "NotSoSecurePa$$")
 
-    username_bytes = username.encode('ascii')
-    username_base64_bytes = base64.b64decode(username_bytes)
-    username_decoded = username_base64_bytes.decode('ascii')
-
-    password_bytes = username.encode('ascii')
-    password_base64_bytes = base64.b64decode(password_bytes)
-    password_decoded = password_base64_bytes.decode('ascii')
-
-    if "4dm1n" == username_decoded and "NotSoSecurePa$$" == password_decoded:
-        session_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
+    if not (correct_password and correct_username):
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+    else:
+        session_token = hashlib.sha256("4dm1n:NotSoSecurePa$$".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
+        app.s_token = session_token
         return {"session_token": f"{session_token}"}
-    else:
-        response.delete_cookie(key="session_token", path="/login_session")
-        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
-
 
 @app.post("/login_token")
-def login_token(*, response: Response, username: str = "", password: str = ""):
+def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "4dm1n")
+    correct_password = secrets.compare_digest(credentials.password, "NotSoSecurePa$$")
 
-    username_bytes = username.encode('ascii')
-    username_base64_bytes = base64.b64decode(username_bytes )
-    username_decoded = username_base64_bytes.decode('ascii')
-
-    password_bytes = username.encode('ascii')
-    password_base64_bytes = base64.b64decode(password_bytes)
-    password_decoded = password_base64_bytes.decode('ascii')
-
-    if "4dm1n" == username_decoded and "NotSoSecurePa$$" == password_decoded:
-        token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
-        response.status_code = status.HTTP_201_CREATED
-        return {"token": f"{token}"}
-    else:
+    if not (correct_password and correct_username):
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+    else:
+        token = hashlib.sha256("4dm1n:NotSoSecurePa$$".encode()).hexdigest()
+        response.status_code = status.HTTP_201_CREATED
+        app.l_token = token
+        return {"token": f"{token}"}
+
 
 # @app.get("/welcome_session")
 # def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = None):
@@ -143,20 +128,6 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 # @app.get("/welcome_token")
 # def come_token(response: Response, token: str = "", format: Optional[str] = None):
 
-# message = "4dm1n:NotSoSecurePa$$"
-# message_bytes = message.encode('ascii')
-# base64_bytes = base64.b64encode(message_bytes)
-# base64_message = base64_bytes.decode('ascii')
-#
-# print(base64_message)
-#
-# message2 = "NGRtMW46"
-# mes3 = "Tm90U29TZWN1cmVQYSQk"
-# message_bytes2 = message2.encode('ascii')
-# base64_bytes2 = base64.b64decode(message_bytes2)
-# base64_message2 = base64_bytes2.decode('ascii')
-#
-# print(base64_message2)
 
 
 
