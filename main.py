@@ -91,7 +91,7 @@ def hello_html(request: Request):
         "request": request, "date": datetime.now().date()})
 
 
-@app.post("/login_session")
+@app.post("/login_session", status_code=201)
 def login_session(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, "4dm1n")
     correct_password = secrets.compare_digest(credentials.password, "NotSoSecurePa$$")
@@ -106,10 +106,9 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         if len(app.s_token) >= 3:
             app.s_token.pop(0)
         app.s_token.append(session_token)
-
         return {"session_token": f"{session_token}"}
 
-@app.post("/login_token")
+@app.post("/login_token", status_code=201)
 def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, "4dm1n")
     correct_password = secrets.compare_digest(credentials.password, "NotSoSecurePa$$")
@@ -128,7 +127,7 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
 
 @app.get("/welcome_session", status_code=200)
 def come_session(session_token: str = Cookie(None), format: Optional[str] = None):
-    if session_token != app.s_token:
+    if session_token not in app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
         if format == "json":
@@ -141,7 +140,7 @@ def come_session(session_token: str = Cookie(None), format: Optional[str] = None
 
 @app.get("/welcome_token", status_code=200)
 def come_token(token: str = "", format: Optional[str] = None):
-    if token != app.s_token:
+    if token not in app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
         if format == "json":
