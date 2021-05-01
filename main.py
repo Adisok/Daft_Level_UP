@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
@@ -93,7 +93,6 @@ def hello_html(request: Request):
 
 @app.post("/login_session")
 def login_session(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
-
     correct_username = secrets.compare_digest(credentials.username, "4dm1n")
     correct_password = secrets.compare_digest(credentials.password, "NotSoSecurePa$$")
 
@@ -120,14 +119,29 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
         return {"token": f"{token}"}
 
 
-# @app.get("/welcome_session")
-# def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = None):
-#     if session_token != app.token:
-#         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
-#
-# @app.get("/welcome_token")
-# def come_token(response: Response, token: str = "", format: Optional[str] = None):
+@app.get("/welcome_session", status_code=200)
+def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = None):
+    if session_token != app.s_token:
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+    else:
+        if format == "json":
+            JSONResponse(content={"message": "Welcome!"})
+        elif format == "html":
+            HTMLResponse(content="<h1>Welcome!</h1>")
+        else:
+            PlainTextResponse(content="Welcome!")
 
 
+@app.get("/welcome_token", status_code=200)
+def come_token(response: Response, token: str = "", format: Optional[str] = None):
+    if token != app.s_token:
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+    else:
+        if format == "json":
+            JSONResponse(content={"message": "Welcome!"})
+        elif format == "html":
+            HTMLResponse(content="<h1>Welcome!</h1>")
+        else:
+            PlainTextResponse(content="Welcome!")
 
 
