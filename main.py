@@ -34,7 +34,6 @@ class PatientResp(BaseModel):
 app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
-app.token = None
 templates = Jinja2Templates(directory="templates")
 
 
