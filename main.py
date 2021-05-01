@@ -94,9 +94,9 @@ def login_session(response: Response, username: str = "", password: str = ""):
 
     if user == username and pas == password:
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
-        response.set_cookie(key="session_token", value=session_token)
+        response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
-
+        return {"session_token": f"{session_token}"}
     else:
         response.delete_cookie(key="session_token", path="/login_session")
         app.token = ""
