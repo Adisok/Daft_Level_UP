@@ -109,7 +109,6 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 
     if user == username and pas == password:
         token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
-        response.set_cookie(key="token_value", value=token)
         response.status_code = status.HTTP_201_CREATED
         return {"token": f"{token}"}
 
