@@ -96,7 +96,7 @@ app.last_login_session = []
 app.last_login_token = []
 
 import random
-random.seed(datetime.datetime.now())
+random.seed(datetime.now())
 
 @app.post("/login_session", status_code=201)
 def login_session(response: Response, credentials: HTTPBasicCredentials = Depends(
