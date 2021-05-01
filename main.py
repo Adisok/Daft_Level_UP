@@ -88,7 +88,15 @@ def hello_html(request: Request):
 @app.post("/login_session")
 def login_session(response: Response, username: str = "", password: str = ""):
 
-    if "NGRtMW46Tm90U29TZWN1cmVQYSQk" == username+password:
+    username_bytes = username.encode('ascii')
+    username_base64_bytes = base64.b64decode(username_bytes)
+    username_decoded = username_base64_bytes.decode('ascii')
+
+    password_bytes = username.encode('ascii')
+    password_base64_bytes = base64.b64decode(password_bytes)
+    password_decoded = password_base64_bytes.decode('ascii')
+
+    if "4dm1n" == username_decoded and "NotSoSecurePa$$" == password_decoded:
         session_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
@@ -101,7 +109,15 @@ def login_session(response: Response, username: str = "", password: str = ""):
 @app.post("/login_token")
 def login_token(*, response: Response, username: str = "", password: str = ""):
 
-    if "NGRtMW46Tm90U29TZWN1cmVQYSQk" == username+password:
+    username_bytes = username.encode('ascii')
+    username_base64_bytes = base64.b64decode(username_bytes )
+    username_decoded = username_base64_bytes.decode('ascii')
+
+    password_bytes = username.encode('ascii')
+    password_base64_bytes = base64.b64decode(password_bytes)
+    password_decoded = password_base64_bytes.decode('ascii')
+
+    if "4dm1n" == username_decoded and "NotSoSecurePa$$" == password_decoded:
         token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
         response.status_code = status.HTTP_201_CREATED
         return {"token": f"{token}"}
