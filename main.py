@@ -40,8 +40,8 @@ app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
 security = HTTPBasic() #KUR** JEST 6 RANO A JA DOPIERO POMYSLALEM
                         # O PRZECZYTANIU DOKUMENTACJI NA TEMAT BASE AUTH W FAST API **UJ MI W *UPE!!!
-app.l_token = None
-app.s_token = None
+app.l_token = []
+app.s_token = []
 
 @app.get("/")
 def root():
@@ -102,7 +102,10 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         session_token = hashlib.sha256("4dm1n:NotSoSecurePa$$".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
-        app.s_token = session_token
+        if len(app.s_token) >= 3:
+            app.s_token.pop(0)
+        app.s_token.append(session_token)
+
         return {"session_token": f"{session_token}"}
 
 @app.post("/login_token")
@@ -115,7 +118,9 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
     else:
         token = hashlib.sha256("4dm1n:NotSoSecurePa$$".encode()).hexdigest()
         response.status_code = status.HTTP_201_CREATED
-        app.l_token = token
+        if len(app.l_token) >= 3:
+            app.l_token.pop(0)
+        app.l_token.append(token)
         return {"token": f"{token}"}
 
 
@@ -146,18 +151,18 @@ def come_token(token: str = "", format: Optional[str] = None):
 
 @app.delete("/logout_session")
 def session_out(session_token: str = Cookie(None), format: Optional[str] = None):
-    if session_token != app.s_token or session_token == "":
+    if session_token not in app.s_token or session_token == "":
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        app.delete(app.s_token)
+        app.s_token.remove(session_token)
         return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
 
 @app.delete("/logout_token")
 def token_out(token: str = "", format: Optional[str] = None):
-    if token != app.l_token or token == "":
+    if token not in app.l_token or token == "":
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        app.delete(app.l_token)
+        app.l_token.remove(token)
         return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
 
 @app.get("/logged_out", status_code=200)
