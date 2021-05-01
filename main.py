@@ -106,7 +106,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
         if len(app.s_token) >= 3:
             app.s_token.pop(0)
         app.s_token.append(session_token)
-        return {"session_token": f"{session_token}"}
+
 
 @app.post("/login_token", status_code=201)
 def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depends(security)):
@@ -127,7 +127,7 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
 
 @app.get("/welcome_session", status_code=200)
 def come_session(session_token: str = Cookie(None), format: Optional[str] = None):
-    if session_token not in app.s_token or session_token == "":
+    if session_token not in app.s_token
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
         if format == "json":
