@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
@@ -94,10 +94,7 @@ def login_session(response: Response, username: str = "", password: str = ""):
     if user == username and pas == password:
         session_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
         response.set_cookie(key="session_token", value=session_token)
-        response = JSONResponse(content=session_token)
-        response.set_cookie(key="session_token", value=session_token)
         response.status_code = status.HTTP_201_CREATED
-        return response
     else:
         response.delete_cookie(key="session_token", path="/login_session")
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
