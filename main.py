@@ -132,8 +132,4 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 #
 # print(base64_message)
 
-import requests
-
-response = requests.post('http://127.0.0.1:8000/login_token?username=4dm1n&password=NotSoSecurePa%24%24')
-print(response.json())
 
