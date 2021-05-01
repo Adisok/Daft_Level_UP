@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
@@ -120,7 +120,7 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
 
 
 @app.get("/welcome_session", status_code=200)
-def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = None):
+def come_session(session_token: str = Cookie(None), format: Optional[str] = None):
     if session_token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
@@ -133,7 +133,7 @@ def come_session(response: Response, session_token: str = Cookie(None), format: 
 
 
 @app.get("/welcome_token", status_code=200)
-def come_token(response: Response, token: str = "", format: Optional[str] = None):
+def come_token(token: str = "", format: Optional[str] = None):
     if token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
@@ -144,4 +144,25 @@ def come_token(response: Response, token: str = "", format: Optional[str] = None
         else:
             return PlainTextResponse(content="Welcome!")
 
+@app.delete("/logout_session")
+def session_out(response: Response,session_token: str = Cookie(None), format: Optional[str] = None):
+    if session_token != app.s_token:
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+    else:
+        response.delete_cookie(key="session_login", path="/login_session")
 
+@app.delete("/logout_token", status_code=200)
+def token_out(response: Response,token: str = "", format: Optional[str] = None):
+    if token != app.s_token:
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+    else:
+        return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
+
+@app.get("/logged_out")
+def log_out(format: Optional[str] = None):
+    if format == "json":
+        return JSONResponse(content={"message": "Logged out!"})
+    elif format == "html":
+        return HTMLResponse(content="<h1>Logged out!</h1>")
+    else:
+        return PlainTextResponse(content="Logged out!")
