@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import Optional, Dict
 from fastapi.templating import Jinja2Templates
 import secrets
-
+from random import randint
 
 
 class PatientResp(BaseModel):
@@ -99,7 +99,8 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
     if not (correct_password and correct_username):
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        session_token = hashlib.sha256("4dm1n:NotSoSecurePa$$".encode()).hexdigest()
+        s_code = str(randint(0,100))
+        session_token = hashlib.sha256(f"{s_code}4dm1n:NotSoSecurePa$${s_code}".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
         if len(app.s_token) >= 3:
@@ -116,7 +117,8 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
     if not (correct_password and correct_username):
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        token = hashlib.sha256("4dm1n:NotSoSecurePa$$".encode()).hexdigest()
+        s_code = randint(100, 200)
+        token = hashlib.sha256(f"{s_code}4dm1n:NotSoSecurePa$${s_code}".encode()).hexdigest()
         response.status_code = status.HTTP_201_CREATED
         if len(app.l_token) >= 3:
             app.l_token.pop(0)
