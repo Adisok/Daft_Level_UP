@@ -97,7 +97,7 @@ def login_session(response: Response, username: str = "", password: str = ""):
         app.token = session_token
         response.set_cookie(key="session_token", value=session_token)
         response.status_code = status.HTTP_201_CREATED
-        return {"session_token": session_token}
+        #return {"session_token": session_token}
 
     if session_token != check_token:
         response.delete_cookie(key="session_token")
