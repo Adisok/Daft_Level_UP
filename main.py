@@ -120,28 +120,28 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
 
 
 @app.get("/welcome_session", status_code=200)
-def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = ""):
+def come_session(response: Response, session_token: str = Cookie(None), format: Optional[str] = None):
     if session_token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
         if format == "json":
-            JSONResponse(content={"message": "Welcome!"})
+            return JSONResponse(content={"message": "Welcome!"})
         elif format == "html":
-            HTMLResponse(content="<h1>Welcome!</h1>")
+            return HTMLResponse(content="<h1>Welcome!</h1>")
         else:
-            PlainTextResponse(content="Welcome!")
+            return PlainTextResponse(content="Welcome!")
 
 
 @app.get("/welcome_token", status_code=200)
-def come_token(response: Response, token: str = "", format: Optional[str] = ""):
+def come_token(response: Response, token: str = "", format: Optional[str] = None):
     if token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
         if format == "json":
-            JSONResponse(content={"message": "Welcome!"})
+            return JSONResponse(content={"message": "Welcome!"})
         elif format == "html":
-            HTMLResponse(content="<h1>Welcome!</h1>")
+            return HTMLResponse(content="<h1>Welcome!</h1>")
         else:
-            PlainTextResponse(content="Welcome!")
+            return PlainTextResponse(content="Welcome!")
 
 
