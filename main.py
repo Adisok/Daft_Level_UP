@@ -100,7 +100,7 @@ def login_session(response: Response, username: str = "", password: str = ""):
         #return {"session_token": session_token}
 
     if session_token != check_token:
-        response.delete_cookie(key="session_token")
+        response.delete_cookie(key="session_token", path="/login_session")
         app.token = ""
         response.set_cookie(key="session_token", value=check_token)
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
