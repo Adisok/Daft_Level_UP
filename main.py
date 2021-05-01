@@ -125,7 +125,6 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 # @app.get("/welcome_token")
 # def come_token(response: Response, token: str = "", format: Optional[str] = None):
 
-
 # message = "4dm1n:NotSoSecurePa$$"
 # message_bytes = message.encode('ascii')
 # base64_bytes = base64.b64encode(message_bytes)
