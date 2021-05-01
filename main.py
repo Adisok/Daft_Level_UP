@@ -97,7 +97,6 @@ def login_session(response: Response, username: str = "", password: str = ""):
         app.token = session_token
         response.set_cookie(key="session_token", value=session_token)
         response.status_code = status.HTTP_201_CREATED
-        #return {"session_token": session_token}
 
     if session_token != check_token:
         response.delete_cookie(key="session_token", path="/login_session")
@@ -107,13 +106,19 @@ def login_session(response: Response, username: str = "", password: str = ""):
 
 
 @app.post("/login_token")
-def login_token(*, response: Response, session_token: str = Cookie(None)):
-    if session_token != app.token:
-        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
-    else:
+def login_token(*, response: Response, username: str = "", password: str = ""):
+    user = "4dm1n"
+    pas = "NotSoSecurePa$$"
+    session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
+    check_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
+
+    if session_token == check_token:
         response.set_cookie(key="token_value", value=session_token)
         response.status_code = status.HTTP_201_CREATED
         return {"token": f"{session_token}"}
+    if session_token != check_token:
+        raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
+
 
 
 # @app.get("/welcome_session")
