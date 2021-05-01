@@ -145,14 +145,15 @@ def come_token(token: str = "", format: Optional[str] = None):
             return PlainTextResponse(content="Welcome!")
 
 @app.delete("/logout_session")
-def session_out(response: Response,session_token: str = Cookie(None), format: Optional[str] = None):
+def session_out(session_token: str = Cookie(None), format: Optional[str] = None):
     if session_token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        response.delete_cookie(key="session_login", path="/login_session")
+        app.delete(app.s_token)
+        return RedirectResponse(status_code=302, url=f"/logged_out?format={format}")
 
 @app.delete("/logout_token", status_code=200)
-def token_out(response: Response,token: str = "", format: Optional[str] = None):
+def token_out(token: str = "", format: Optional[str] = None):
     if token != app.s_token:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
