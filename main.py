@@ -86,32 +86,23 @@ def hello_html(request: Request):
 
 
 @app.post("/login_session")
-@app.get("/login_session")
 def login_session(response: Response, username: str = "", password: str = ""):
-    user = "4dm1n"
-    pas = "NotSoSecurePa$$"
-    password = password.replace("%24%24", "$$")
 
     if "NGRtMW46Tm90U29TZWN1cmVQYSQk" == username+password:
-        session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
+        session_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
         return {"session_token": f"{session_token}"}
     else:
         response.delete_cookie(key="session_token", path="/login_session")
-        app.token = ""
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
 
 @app.post("/login_token")
-@app.get("/login_token")
 def login_token(*, response: Response, username: str = "", password: str = ""):
-    user = "4dm1n"
-    pas = "NotSoSecurePa$$"
-    password = password.replace("%24%24", "$$")
 
     if "NGRtMW46Tm90U29TZWN1cmVQYSQk" == username+password:
-        token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
+        token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
         response.status_code = status.HTTP_201_CREATED
         return {"token": f"{token}"}
     else:
@@ -131,5 +122,12 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 # base64_message = base64_bytes.decode('ascii')
 #
 # print(base64_message)
-
+#
+# message2 = "NGRtMW46"
+# mes3 = "Tm90U29TZWN1cmVQYSQk"
+# message_bytes2 = message2.encode('ascii')
+# base64_bytes2 = base64.b64decode(message_bytes2)
+# base64_message2 = base64_bytes2.decode('ascii')
+#
+# print(base64_message2)
 
