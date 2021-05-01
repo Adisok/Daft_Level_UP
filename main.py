@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie
-from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
@@ -90,18 +90,16 @@ def hello_html(request: Request):
 def login_session(response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
-    session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
-    check_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
 
-    if session_token == check_token:
-        app.token = session_token
+    if user == username and pas == password:
+        session_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
+        response.set_cookie(key="session_token", value=session_token)
+        response = JSONResponse(content=session_token)
         response.set_cookie(key="session_token", value=session_token)
         response.status_code = status.HTTP_201_CREATED
-
-    if session_token != check_token:
+        return response
+    else:
         response.delete_cookie(key="session_token", path="/login_session")
-        app.token = ""
-        response.set_cookie(key="session_token", value=check_token)
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
 
@@ -109,14 +107,12 @@ def login_session(response: Response, username: str = "", password: str = ""):
 def login_token(*, response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
-    session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
-    check_token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
 
-    if session_token == check_token:
-        response.set_cookie(key="token_value", value=session_token)
+    if user == username and pas == password:
         response.status_code = status.HTTP_201_CREATED
-        return {"token": f"{session_token}"}
-    if session_token != check_token:
+        token = hashlib.sha256(f"{username}{password}".encode()).hexdigest()
+        return {"token": f"{token}"}
+    else:
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
 
