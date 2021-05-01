@@ -99,7 +99,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
     if not (correct_password and correct_username):
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        s_code = str(randint(0,100))
+        s_code = str(randint(0,1000))
         session_token = hashlib.sha256(f"{s_code}4dm1n:NotSoSecurePa$${s_code}".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
@@ -116,7 +116,7 @@ def login_token(*, response: Response, credentials: HTTPBasicCredentials = Depen
     if not (correct_password and correct_username):
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
     else:
-        s_code = randint(100, 200)
+        s_code = randint(0, 1000)
         token = hashlib.sha256(f"{s_code}4dm1n:NotSoSecurePa$${s_code}".encode()).hexdigest()
         response.status_code = status.HTTP_201_CREATED
         if len(app.l_token) >= 3:
