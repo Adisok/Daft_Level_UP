@@ -1,13 +1,11 @@
-import base64
-
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from fastapi.responses import HTMLResponse
 import hashlib
 from datetime import datetime, timedelta, date
 from pydantic import BaseModel
 from typing import Optional, Dict
 from fastapi.templating import Jinja2Templates
-
+import base64
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -37,7 +35,7 @@ app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
-app.token = None
+
 
 @app.get("/")
 def root():
@@ -92,15 +90,16 @@ def hello_html(request: Request):
 def login_session(response: Response, username: str = "", password: str = ""):
     user = "4dm1n"
     pas = "NotSoSecurePa$$"
+    password = password.replace("%24%24", "$$")
 
-
-    if f"{base64.b64encode(f'{user}:{pas}')}" == f"{username}:{password}":
+    if "NGRtMW46Tm90U29TZWN1cmVQYSQk" == username+password:
         session_token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
         response.set_cookie(key="session_token", value=f"{session_token}")
         response.status_code = status.HTTP_201_CREATED
         return {"session_token": f"{session_token}"}
     else:
         response.delete_cookie(key="session_token", path="/login_session")
+        app.token = ""
         raise HTTPException(status_code=401, detail="Wrong Passowrd or Username")
 
 
@@ -111,7 +110,7 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
     pas = "NotSoSecurePa$$"
     password = password.replace("%24%24", "$$")
 
-    if f"{base64.b64encode(f'{user}:{pas}')}" == f"{username}:{password}":
+    if "NGRtMW46Tm90U29TZWN1cmVQYSQk" == username+password:
         token = hashlib.sha256(f"{user}{pas}".encode()).hexdigest()
         response.status_code = status.HTTP_201_CREATED
         return {"token": f"{token}"}
@@ -125,4 +124,17 @@ def login_token(*, response: Response, username: str = "", password: str = ""):
 #
 # @app.get("/welcome_token")
 # def come_token(response: Response, token: str = "", format: Optional[str] = None):
+
+
+# message = "4dm1n:NotSoSecurePa$$"
+# message_bytes = message.encode('ascii')
+# base64_bytes = base64.b64encode(message_bytes)
+# base64_message = base64_bytes.decode('ascii')
+#
+# print(base64_message)
+
+import requests
+
+response = requests.post('http://127.0.0.1:8000/login_token?username=4dm1n&password=NotSoSecurePa%24%24')
+print(response.json())
 
