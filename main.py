@@ -208,11 +208,11 @@ async def ret_customers():
 
 
 @app.get("/products/[id]")
-async def get_prduct_id(id: int):
+async def get_prduct_id(product_id: int):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
     id_name = app.db_connection.execute(
-        "SELECT ProductId AS id, ProdcutName as name FROM products WHERE ProductID = :id", {"id": id}
+        "SELECT ProductId AS id, ProdcutName as name FROM products WHERE ProductID = :product_id", {"product_id": product_id}
         ).fetchone()
     if any(id_name):
         return id_name
