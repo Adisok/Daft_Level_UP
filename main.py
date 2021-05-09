@@ -212,7 +212,7 @@ async def get_prduct_id(product_id: int):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
     id_name = app.db_connection.execute(
-        "SELECT ProductId AS id, ProdcutName as name FROM products WHERE ProductID = :product_id", {"product_id": product_id}
+        "SELECT ProductId AS id, ProdcutName AS name FROM products WHERE ProductId = :product_id", {"product_id": product_id}
         ).fetchone()
     if any(id_name):
         return id_name
