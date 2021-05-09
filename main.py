@@ -207,7 +207,7 @@ async def ret_customers():
     }
 
 
-@app.get("/products/[id]")
+@app.get("/products/{product_id}")
 async def get_prduct_id(product_id: int):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
