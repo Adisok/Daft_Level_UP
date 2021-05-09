@@ -8,6 +8,7 @@ from typing import Optional, Dict
 from fastapi.templating import Jinja2Templates
 import secrets
 from random import randint
+import sqlite3
 
 
 class PatientResp(BaseModel):
@@ -175,3 +176,59 @@ def log_out(format: Optional[str] = None):
     else:
         return PlainTextResponse(content="Logged out!")
 
+
+@app.on_event("startup")
+async def startup():
+    app.db_connection = sqlite3.connect("northwind.db")
+    app.db_connection.text_factory = lambda b: b.decode(errors="ignore")
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    app.db_connection.close()
+
+
+@app.get("/categories")
+async def ret_categories():
+    cursor = app.db_connection.cursor()
+    cursor.row_factory = sqlite3.Row
+    categories = cursor.execute("SELECT CategoryID as id, CategoryName as name FROM  Categories").fetchall()
+    return {
+        "categories": categories
+    }
+
+@app.get("/customers")
+async def ret_customers():
+    cursor = app.db_connection.cursor()
+    cursor.row_factory = sqlite3.Row
+    categories = cursor.execute("SELECT CustomerId AS id, CompanyName AS name,Address || ' ' || PostalCode || ' ' || City || ' ' || Country AS full_address FROM customers""").fetchall()
+    return {
+        'customers': categories
+    }
+
+
+@app.get("/products/[id]")
+async def get_prduct_id(id: int):
+    app.db_connection.row_factory = sqlite3.Row
+    id_name = app.db_connection.execute(
+        "SELECT ProductId AS id, ProdcutName as name FROM products WHERE ProductID = :id", {"id": id}
+        ).fetchone()
+    if any(id_name):
+        return id_name
+    else:
+        raise HTTPException(status_code=404, detail="Wrong ID")
+
+@app.get("/employees")
+async def get_emps(limit: Optional[int] = None, offset: Optional[int] = None, order: Optional[str] = None):
+    app.db_connection.row_factory = sqlite3.Row
+    if not ["first_name","last_name", "city"] in order:
+        raise HTTPException(status_code=400, detail="Wrong order")
+    limits = " "
+    limits += f"LIMIT {limit}"
+    limits += f"OFFSET {offset}"
+    info = app.db_connection.execute(
+        "SELECT EmployeeId AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM employees ORDER BY :order" + limitation, {"order": order}
+        ).fetchall()
+    return {
+    "employees": info
+    }
