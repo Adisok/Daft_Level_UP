@@ -209,7 +209,8 @@ async def ret_customers():
 
 @app.get("/products/[id]")
 async def get_prduct_id(id: int):
-    app.db_connection.row_factory = sqlite3.Row
+    cursor = app.db_connection.cursor()
+    cursor.row_factory = sqlite3.Row
     id_name = app.db_connection.execute(
         "SELECT ProductId AS id, ProdcutName as name FROM products WHERE ProductID = :id", {"id": id}
         ).fetchone()
@@ -220,6 +221,8 @@ async def get_prduct_id(id: int):
 
 @app.get("/employees")
 async def get_emps(limit: Optional[int] = None, offset: Optional[int] = None, order: Optional[str] = None):
+    cursor = app.db_connection.cursor()
+    cursor.row_factory = sqlite3.Row
     app.db_connection.row_factory = sqlite3.Row
     if not ["first_name","last_name", "city"] in order:
         raise HTTPException(status_code=400, detail="Wrong order")
