@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from main import app
 import pytest
+import sqlite3
 
 client = TestClient(app)
 
@@ -34,3 +35,5 @@ def test_register():
 def test_get_patient_data():
     response = client.post(f"/register/{'1'}")
     print(response.text, response.status_code)
+
+

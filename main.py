@@ -229,11 +229,11 @@ async def get_emps(limit: Optional[int] = -1, offset: Optional[int] = 0, order: 
     app.db_connection.row_factory = sqlite3.Row
     if order not in ["first_name", "last_name", "city", "id"]:
         raise HTTPException(status_code=400, detail="Wrong order")
-    if order == "id":
-        order = "employeeid"
+
     info = app.db_connection.execute(
-        "SELECT EmployeeId AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM Employees "
-        "ORDER BY :order LIMIT :limit OFFSET :offset", {"order": order.replace("_",""), "limit": limit, "offset": offset}
+        "SELECT EmployeeID AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM Employees "
+        f"ORDER BY {order} LIMIT :limit OFFSET :offset",
+        {"limit": limit, "offset": offset}
         ).fetchall()
     return {
     "employees": info
