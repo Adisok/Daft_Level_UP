@@ -223,7 +223,7 @@ async def get_prduct_id(product_id: int):
         raise HTTPException(status_code=404, detail="Wrong ID")
 
 @app.get("/employees")
-async def get_emps(limit: Optional[int] = -1, offset: Optional[int] = 0, order: Optional[str] = "id"):
+async def get_emps(limit: Optional[int] = 0, offset: Optional[int] = 0, order: Optional[str] = "id"):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
     app.db_connection.row_factory = sqlite3.Row
