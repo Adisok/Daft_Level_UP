@@ -201,7 +201,9 @@ async def ret_categories():
 async def ret_customers():
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
-    categories = cursor.execute("SELECT CustomerId AS id, CompanyName AS name,Address || ' ' || PostalCode || ' ' || City || ' ' || Country AS full_address FROM customers""").fetchall()
+    categories = cursor.execute("SELECT CustomerId AS id, CompanyName AS name,"
+                                "Address || ' ' || PostalCode || ' ' || City || ' ' || "
+                                "Country AS full_address FROM customers ORDER BY CustomerID""").fetchall()
     return {
         'customers': categories
     }
@@ -212,7 +214,7 @@ async def get_prduct_id(product_id: int):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
     id_name = app.db_connection.execute(
-        "SELECT ProductId AS id, ProdcutName AS name FROM products WHERE ProductId = :product_id", {"product_id": product_id}
+        "SELECT ProductId AS id, ProductName AS name FROM products WHERE ProductId = :product_id", {"product_id": product_id}
         ).fetchone()
     if any(id_name):
         return id_name
@@ -220,18 +222,19 @@ async def get_prduct_id(product_id: int):
         raise HTTPException(status_code=404, detail="Wrong ID")
 
 @app.get("/employees")
-async def get_emps(limit: Optional[int] = None, offset: Optional[int] = None, order: Optional[str] = None):
+async def get_emps(limit: Optional[int] = 0, offset: Optional[int] = 0, order: Optional[str] = "id"):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
     app.db_connection.row_factory = sqlite3.Row
-    if not ["first_name","last_name", "city"] in order:
+    if order not in ["first_name","last_name", "city", "id"]:
         raise HTTPException(status_code=400, detail="Wrong order")
     limits = " "
-    limits += f"LIMIT {limit}"
+    limits += f"LIMIT {limit} "
     limits += f"OFFSET {offset}"
     info = app.db_connection.execute(
-        "SELECT EmployeeId AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM employees ORDER BY :order" + limitation, {"order": order}
+        "SELECT EmployeeId AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM employees ORDER BY :order" + limits, {"order": order}
         ).fetchall()
     return {
     "employees": info
     }
+
