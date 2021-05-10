@@ -249,18 +249,16 @@ async def get_products():
 
 @app.get("/products/{id}/orders")
 async def get_products_by_id(product_id: int):
-    products_info = app.db_connection.execute(
-        f'''SELECT Products.ProductID, Orders.OrderID AS id, Customers.CompanyName AS customer, 
-        ROUND(([Order Details].UnitPrice *[Order Details].Quantity) -([Order Details].Discount*[Order Details].UnitPrice *[Order Details].Quantity),2)as total_price
-        FROM Products JOIN [Order Details] ON Products.ProductID = [Order Details].ProductID JOIN Orders 
-        ON [Order Details].OrderID = Orders.OrderID JOIN Customers 
-        ON Orders.CustomerID = Customers.CustomerID 
-        WHERE Products.ProductID = {product_id} ORDER BY Orders.OrderID
-    ''').fetchall()
+    product_info = app.db_connection.execute("""
+        SELECT o.OrderId AS id, c.CompanyName AS customer, od.Quantity AS quantity,
+        ROUND((od.UnitPrice * od.Quantity) - (od.Discount * (od.UnitPrice * od.Quantity)), 2) AS total_price
+        FROM Orders AS o JOIN Customers AS c USING (CustomerID)
+        JOIN 'Order Details' AS od USING (OrderId)
+        WHERE od.ProductId= ?""", (product_id,)).fetchall()
 
-    if products_info:
+    if product_info:
         return {
-            "orders": products_info
+            "orders": product_info
         }
     else:
         raise HTTPException(status_code=404, detail="Wrong ID")
