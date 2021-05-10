@@ -261,7 +261,11 @@ async def get_products_by_id(product_id: int):
         ORDER BY Orders.OrderID
         """
     ).fetchone()
+
+    total_price = (products_info["unit_price"] * products_info["quantity"]) - \
+                  (products_info["dicount"] * (products_info["unit_price"] * products_info["quantity"]))
     if products_info:
+        products_info["total_price"] = round(total_price)
         return {
             "orders": products_info
         }
