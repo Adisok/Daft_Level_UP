@@ -216,8 +216,9 @@ async def get_prduct_id(product_id: int):
     id_name = app.db_connection.execute(
         "SELECT ProductId AS id, ProductName AS name FROM Products WHERE ProductId = :product_id", {"product_id": product_id}
         ).fetchone()
+    print(type(id_name))
     if id_name:
-        return id_name
+        return {"id": id_name[0], "name": id_name[1]}
     else:
         raise HTTPException(status_code=404, detail="Wrong ID")
 
