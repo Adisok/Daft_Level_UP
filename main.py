@@ -216,7 +216,7 @@ async def get_prduct_id(product_id: int):
     id_name = app.db_connection.execute(
         "SELECT ProductId AS id, ProductName AS name FROM Products WHERE ProductId = :product_id", {"product_id": product_id}
         ).fetchone()
-    print(type(id_name))
+
     if id_name:
         return {"id": id_name[0], "name": id_name[1]}
     else:
@@ -233,7 +233,7 @@ async def get_emps(limit: Optional[int] = 0, offset: Optional[int] = 0, order: O
     limits += f"LIMIT {limit} "
     limits += f"OFFSET {offset}"
     info = app.db_connection.execute(
-        "SELECT EmployeeId AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM employees ORDER BY :order" + limits, {"order": order}
+        "SELECT EmployeeId AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM Employees ORDER BY :order" + limits, {"order": order}
         ).fetchall()
     return {
     "employees": info
