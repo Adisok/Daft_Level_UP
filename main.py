@@ -249,16 +249,24 @@ async def get_products():
 
 @app.get("/products/{product_id}/orders")
 async def get_products_by_id(product_id: int):
-    product_info = app.db_connection.execute("""
-        SELECT o.OrderId AS id, c.CompanyName AS customer, od.Quantity AS quantity,
-        ROUND((od.UnitPrice * od.Quantity) - (od.Discount * (od.UnitPrice * od.Quantity)), 2) AS total_price
-        FROM Orders AS o JOIN Customers AS c USING (CustomerID)
-        JOIN 'Order Details' AS od USING (OrderId)
-        WHERE od.ProductId= ?""", (product_id,)).fetchall()
+    products_info = app.db_connection.execute(
+        f'''SELECT Products.ProductID, Orders.OrderID AS id, Customers.CompanyName AS customer, 
+        [Order Details].Quantity AS quantity, [Order Details].UnitPrice AS unit_price,
+        [Order Details].Discount as discount 
+        FROM Products JOIN [Order Details] ON Products.ProductID = [Order Details].ProductID JOIN Orders 
+        ON [Order Details].OrderID = Orders.OrderID JOIN Customers 
+        ON Orders.CustomerID = Customers.CustomerID 
+        WHERE Products.ProductID = {product_id} ORDER BY Orders.OrderID
+    ''').fetchall()
 
-    if product_info:
+
+    if products_info != []:
+
+        ret_prod_info = [{"id": i["id"], "customer": i["customer"], "quantity": i["quantity"],
+                          "total_price": round((i["unit_price"] * i["quantity"]) - \
+                      (i["discount"] * (i["unit_price"] * i["quantity"])),2)} for i in products_info]
         return {
-            "orders": product_info
+            "orders": ret_prod_info
         }
     else:
         raise HTTPException(status_code=404, detail="Wrong ID")
