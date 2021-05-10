@@ -270,3 +270,62 @@ async def get_products_by_id(product_id: int):
         }
     else:
         raise HTTPException(status_code=404, detail="Wrong ID")
+
+
+class Category(BaseModel):
+    name: str
+
+@app.post("/categories", status_code=201)
+def add_category(category: Category):
+    cursor = app.db_connection.execute(
+        "INSERT INTO Categories (CategoryName) VALUES {?}", (category.name,)
+    )
+    app.db_connection.commit()
+    new_customer_id = cursor.lastrowid
+
+    new_cat = app.db_connection.execute(
+        """SELECT CategoryID AS id, CategoryName AS name
+         FROM Categories WHERE CustomerID = ?""",
+        (new_customer_id,)).fetchone()
+
+    return new_cat
+
+@app.put("/categories/{cat_id}", status_code=200)
+def put_category(category: Category, cat_id: int):
+
+    cat_data = app.db_connection.execute(
+        "SELECT CategoryID as id, CategoryName as name"
+        "FROM Categories WHERE CustomerID = ?",
+        (cat_id,)
+    ).fetchone()
+
+    if cat_data:
+        cursor = app.db_connection.execute(
+            "UPDATE Categories SET CategoryName = ? WHERE CategoryID = ?",
+            (category.name, cat_id)
+        )
+        app.db_connection.commit()
+
+        cat_data = app.db_connection.execute(
+            "SELECT CategoryName AS name, CategoryID AS id FROM Categories Where CategoryID = ?",
+            (cat_id,)
+        ).fetchone()
+        return cat_data
+    else:
+        raise HTTPException(status_code=404, detail="Not Oki Doki ID")
+
+@app.delete("/categories/{id}", status_code=200)
+def del_category(cat_id: int):
+    rows_before = app.db_connection.rowcount
+
+    cursor = app.db_connection.execute(
+        "DELETE FROM Categories WHERE CategoryID = ?",
+        (cat_id,)
+    )
+    app.db_connection.commit()
+
+    rows_after = cursor.rowcount
+    if rows_before != rows_after:
+        return {"deleted": 1}
+    else:
+        raise HTTPException(status_code=404, detail="Not Oki Doki ID")
