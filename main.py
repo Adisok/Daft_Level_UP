@@ -260,11 +260,11 @@ async def get_products_by_id(product_id: int):
         WHERE Products.ProductID = {product_id}
         ORDER BY Orders.OrderID
         """
-    ).fetchone()
+    ).fetchall()
 
-    total_price = (products_info["unit_price"] * products_info["quantity"]) - \
-                  (products_info["dicount"] * (products_info["unit_price"] * products_info["quantity"]))
     if products_info:
+        total_price = (products_info["unit_price"] * products_info["quantity"]) - \
+                      (products_info["dicount"] * (products_info["unit_price"] * products_info["quantity"]))
         products_info["total_price"] = round(total_price)
         return {
             "orders": products_info
