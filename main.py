@@ -250,22 +250,20 @@ async def get_products():
 @app.get("/products/{id}/orders")
 async def get_products_by_id(product_id: int):
     products_info = app.db_connection.execute(
-        f"""
-        SELECT Products.ProductID, Orders.OrderId as id, Customers.CompanyName as customer, 
-        [Order Details].Quantity as quantity,[Order Details].UnitPrice as unit_price, 
-        [Order Details].Discount as discount
-        FROM Products JOIN [Order Details] ON Products.ProductID = [Order Details].OrderID 
-        JOIN Orders ON [Order Details].OrderID = Orders.OrderID 
-        JOIN Customers ON Orders.CustomerID = Customers.CustomerID
-        WHERE Products.ProductID = {product_id}
-        ORDER BY Orders.OrderID
-        """
-    ).fetchall()
+        f'''SELECT Products.ProductID, Orders.OrderID AS id, Customers.CompanyName AS customer, 
+        [Order Details].Quantity AS quantity, [Order Details].UnitPrice AS unitprice,
+        [Order Details].Discount as discount 
+        FROM Products JOIN [Order Details] ON Products.ProductID = [Order Details].ProductID JOIN Orders 
+        ON [Order Details].OrderID = Orders.OrderID JOIN Customers 
+        ON Orders.CustomerID = Customers.CustomerID 
+        WHERE Products.ProductID = {product_id} ORDER BY Orders.OrderID
+    ''').fetchall()
 
-    if products_info:
+
+    if products_info != []:
         total_price = (products_info["unit_price"] * products_info["quantity"]) - \
                       (products_info["dicount"] * (products_info["unit_price"] * products_info["quantity"]))
-        products_info["total_price"] = round(total_price)
+        products_info["total_price"] = round(total_price,2)
         return {
             "orders": products_info
         }
