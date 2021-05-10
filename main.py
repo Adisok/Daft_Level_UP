@@ -201,8 +201,9 @@ async def ret_categories():
 async def ret_customers():
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
-    categories = cursor.execute("""SELECT CustomerId AS id, CompanyName AS name,
-          Address || ' ' || PostalCode || ' ' || City || ' ' || Country AS full_address FROM customers""").fetchall()
+    categories = cursor.execute("SELECT CustomerId AS id, CompanyName AS name,"
+                                "Address || ' ' || PostalCode || ' ' || City || ' ' || Country AS full_address "
+                                "FROM customers").fetchall()
     return {
         'customers': categories
     }
@@ -213,9 +214,9 @@ async def get_prduct_id(product_id: int):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
     id_name = app.db_connection.execute(
-        "SELECT ProductId AS id, ProductName AS name FROM products WHERE ProductId = :product_id", {"product_id": product_id}
+        "SELECT ProductId AS id, ProductName AS name FROM Products WHERE ProductId = :product_id", {"product_id": product_id}
         ).fetchone()
-    if any(id_name):
+    if id_name:
         return id_name
     else:
         raise HTTPException(status_code=404, detail="Wrong ID")
