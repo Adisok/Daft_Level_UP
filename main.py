@@ -203,7 +203,7 @@ async def ret_customers():
     cursor.row_factory = sqlite3.Row
     categories = cursor.execute("SELECT CustomerId AS id, CompanyName AS name,"
                                 "Address || ' ' || PostalCode || ' ' || City || ' ' || "
-                                "Country AS full_address FROM customers ORDER BY CustomerID""").fetchall()
+                                "Country AS full_address FROM customers ORDER BY CustomerID").fetchall()
     return {
         'customers': categories
     }
