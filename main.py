@@ -180,6 +180,7 @@ def log_out(format: Optional[str] = None):
 @app.on_event("startup")
 async def startup():
     app.db_connection = sqlite3.connect("northwind.db")
+    app.db_connection.row_factory = sqlite3.Row
     app.db_connection.text_factory = lambda b: b.decode(errors="ignore")
 
 
@@ -190,18 +191,14 @@ async def shutdown():
 
 @app.get("/categories")
 async def ret_categories():
-    cursor = app.db_connection.cursor()
-    cursor.row_factory = sqlite3.Row
-    categories = cursor.execute("SELECT CategoryID as id, CategoryName as name FROM  Categories").fetchall()
+    categories = app.db_connection.execute("SELECT CategoryID as id, CategoryName as name FROM  Categories").fetchall()
     return {
         "categories": categories
     }
 
 @app.get("/customers")
 async def ret_customers():
-    cursor = app.db_connection.cursor()
-    cursor.row_factory = sqlite3.Row
-    categories = cursor.execute("SELECT CustomerId AS id, CompanyName AS name,"
+    categories = app.db_connection.execute("SELECT CustomerId AS id, CompanyName AS name,"
                                 "Address || ' ' || PostalCode || ' ' || City || ' ' || Country AS full_address "
                                 "FROM customers").fetchall()
     return {
@@ -211,8 +208,6 @@ async def ret_customers():
 
 @app.get("/products/{product_id}")
 async def get_prduct_id(product_id: int):
-    cursor = app.db_connection.cursor()
-    cursor.row_factory = sqlite3.Row
     id_name = app.db_connection.execute(
         "SELECT ProductId AS id, ProductName AS name FROM Products WHERE ProductId = :product_id", {"product_id": product_id}
         ).fetchone()
@@ -224,9 +219,6 @@ async def get_prduct_id(product_id: int):
 
 @app.get("/employees")
 async def get_emps(limit: Optional[int] = -1, offset: Optional[int] = 0, order: Optional[str] = "id"):
-    cursor = app.db_connection.cursor()
-    cursor.row_factory = sqlite3.Row
-    app.db_connection.row_factory = sqlite3.Row
     if order not in ["first_name", "last_name", "city", "id"]:
         raise HTTPException(status_code=400, detail="Wrong order")
 
