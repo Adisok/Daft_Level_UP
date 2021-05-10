@@ -233,7 +233,6 @@ async def get_emps(limit: Optional[int] = -1, offset: Optional[int] = 0, order: 
 
 @app.get("/products_extended")
 async def get_products():
-
     products_info = app.db_connection.execute(
     """
     SELECT Products.ProductID as id, Products.ProductName as name, 
@@ -245,4 +244,21 @@ async def get_products():
 
     return {
         "products_extended": products_info
+    }
+
+
+@app.get("/products/{id}/orders")
+async def get_products_by_id(product_id: int):
+    products_info = app.db_connection.execute(
+        """
+        SELECT Orders.OrderId as id, Customers.CompanyName as customer, [Order Details].Quantity as quantity,
+        [Order Details].UnitPrice as unit_price, [Order Details].Discount as discount
+        FROM Orders JOIN Customers ON Orders.CustomerID = Customers.CustomerID 
+        JOIN [Order Details] ON Orders.OrderID = [Order Details].OrderID 
+        ORDER BY Orders.OrderID
+        """
+    ).fetchone()
+
+    return {
+        "orders": products_info
     }
