@@ -40,6 +40,7 @@ app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
 security = HTTPBasic()
+
 app.l_token = []
 app.s_token = []
 
@@ -258,11 +259,14 @@ async def get_products_by_id(product_id: int):
         WHERE Products.ProductID = {product_id} ORDER BY Orders.OrderID
     ''').fetchall()
 
+
     if products_info != []:
+
+        ret_prod_info = [{"id": i["id"], "customer": i["customer"], "quantity": i["quantity"],
+                          "total_price": round((i["unit_price"] * i["quantity"]) - \
+                      (i["discount"] * (i["unit_price"] * i["quantity"])),2)} for i in products_info]
         return {
-            "orders": [{"id": i["id"], "customer": i["customer"], "quantity": i["quantity"],"total_price":
-            round((i["unit_price"] * i["quantity"]) - (i["discount"] * (i["unit_price"] * i["quantity"])),2)}
-            for i in products_info]
+            "orders": ret_prod_info
         }
     else:
         raise HTTPException(status_code=404, detail="Wrong ID")
