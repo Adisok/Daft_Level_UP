@@ -236,8 +236,8 @@ async def get_products():
 
     products_info = app.db_connection.execute(
         "SELECT Products.ProductID AS id, Products.ProductName AS name, Categories.CategoryName AS category, "
-        " Suppliers.CompanyName AS supplier FROM Products JOIN Categories ON Products.ProductID = Categories.CategoryID "
-        "JOIN Suppliers ON Products.SupplierID = Suppliers.SupplierID"
+        " Suppliers.CompanyName AS supplier FROM Products JOIN Categories ON Products.CategoryID = Categories.CategoryID "
+        "JOIN Suppliers ON Products.SupplierID = Suppliers.SupplierID ORDER BY Products.ProductsID"
     ).fetchall()
 
     return {
