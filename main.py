@@ -251,19 +251,16 @@ async def get_products():
 async def get_products_by_id(product_id: int):
     products_info = app.db_connection.execute(
         f'''SELECT Products.ProductID, Orders.OrderID AS id, Customers.CompanyName AS customer, 
-        [Order Details].Quantity AS quantity, [Order Details].UnitPrice AS unit_price,
-        [Order Details].Discount as discount 
+        ROUND(([Order Details].UnitPrice * [Order Details].Quantity) - ([Order Details].Discount * 
+        [Order Details].UnitPrice * [Order Details].Quantity),2) total_price
         FROM Products JOIN [Order Details] ON Products.ProductID = [Order Details].ProductID JOIN Orders 
         ON [Order Details].OrderID = Orders.OrderID JOIN Customers 
         ON Orders.CustomerID = Customers.CustomerID 
         WHERE Products.ProductID = {product_id} ORDER BY Orders.OrderID
     ''').fetchall()
 
-
     if products_info != []:
-        total_price = (products_info["unit_price"] * products_info["quantity"]) - \
-                      (products_info["discount"] * (products_info["unit_price"] * products_info["quantity"]))
-        products_info["total_price"] = round(total_price, 2)
+
         return {
             "orders": products_info
         }
