@@ -223,15 +223,17 @@ async def get_prduct_id(product_id: int):
         raise HTTPException(status_code=404, detail="Wrong ID")
 
 @app.get("/employees")
-async def get_emps(limit: Optional[int] = 0, offset: Optional[int] = 0, order: Optional[str] = "id"):
+async def get_emps(limit: Optional[int] = -1, offset: Optional[int] = 0, order: Optional[str] = "id"):
     cursor = app.db_connection.cursor()
     cursor.row_factory = sqlite3.Row
     app.db_connection.row_factory = sqlite3.Row
     if order not in ["first_name", "last_name", "city", "id"]:
         raise HTTPException(status_code=400, detail="Wrong order")
+    if order == "id":
+        order = "employeeid"
     info = app.db_connection.execute(
         "SELECT EmployeeId AS id, LastName AS last_name, FirstName AS first_name, City AS city FROM Employees "
-        "ORDER BY :order LIMIT :limit OFFSET :offset", {"order": order, "limit": limit, "offset": offset}
+        "ORDER BY :order LIMIT :limit OFFSET :offset", {"order": order.replace("_",""), "limit": limit, "offset": offset}
         ).fetchall()
     return {
     "employees": info
