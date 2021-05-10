@@ -316,16 +316,14 @@ def put_category(category: Category, cat_id: int):
 
 @app.delete("/categories/{id}", status_code=200)
 def del_category(cat_id: int):
-    rows_before = app.db_connection.rowcount
-
     cursor = app.db_connection.execute(
         "DELETE FROM Categories WHERE CategoryID = ?",
         (cat_id,)
     )
     app.db_connection.commit()
 
-    rows_after = cursor.rowcount
-    if rows_before != rows_after:
-        return {"deleted": 1}
+    rows = cursor.rowcount
+    if rows:
+        return {"deleted": rows}
     else:
         raise HTTPException(status_code=404, detail="Not Oki Doki ID")
