@@ -39,8 +39,7 @@ app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
-security = HTTPBasic() #KUR** JEST 6 RANO A JA DOPIERO POMYSLALEM
-                        # O PRZECZYTANIU DOKUMENTACJI NA TEMAT BASE AUTH W FAST API **UJ MI W *UPE!!!
+security = HTTPBasic()
 app.l_token = []
 app.s_token = []
 
@@ -259,14 +258,11 @@ async def get_products_by_id(product_id: int):
         WHERE Products.ProductID = {product_id} ORDER BY Orders.OrderID
     ''').fetchall()
 
-    if products_info == []:
-        raise HTTPException(status_code=404, detail="Wrong ID")
-    else:
-        total_price = (products_info["unit_price"] * products_info["quantity"]) - \
-                      (products_info["discount"] * (products_info["unit_price"] * products_info["quantity"]))
-        ret_prod_info = [{"id": i["id"], "customer": i["customer"], "quantity": i["quantity"],
-                          "total_price": total_price} for i in products_info]
+    if products_info != []:
         return {
-            "orders": ret_prod_info
+            "orders": [{"id": i["id"], "customer": i["customer"], "quantity": i["quantity"],"total_price":
+            round((i["unit_price"] * i["quantity"]) - (i["discount"] * (i["unit_price"] * i["quantity"])),2)}
+            for i in products_info]
         }
-
+    else:
+        raise HTTPException(status_code=404, detail="Wrong ID")
