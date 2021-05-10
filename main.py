@@ -278,15 +278,16 @@ class Category(BaseModel):
 @app.post("/categories", status_code=201)
 def add_category(category: Category):
     cursor = app.db_connection.execute(
-        "INSERT INTO Categories (CategoryName) VALUES {?}", (category.name,)
+        "INSERT INTO Categories (CategoryName) VALUES (?)", (category.name,)
     )
     app.db_connection.commit()
-    new_customer_id = cursor.lastrowid
+    new_category_id = cursor.lastrowid
 
+    app.db_connection.row_factory = sqlite3.Row
     new_cat = app.db_connection.execute(
         """SELECT CategoryID AS id, CategoryName AS name
-         FROM Categories WHERE CustomerID = ?""",
-        (new_customer_id,)).fetchone()
+         FROM Categories WHERE CategoryID = ?""",
+        (new_category_id,)).fetchone()
 
     return new_cat
 
@@ -299,7 +300,7 @@ def put_category(category: Category, cat_id: int):
         (cat_id,)
     ).fetchone()
 
-    if cat_data:
+    if cat_data != []:
         cursor = app.db_connection.execute(
             "UPDATE Categories SET CategoryName = ? WHERE CategoryID = ?",
             (category.name, cat_id)
@@ -320,10 +321,10 @@ def del_category(cat_id: int):
         "DELETE FROM Categories WHERE CategoryID = ?",
         (cat_id,)
     )
-    app.db_connection.commit()
 
     rows = cursor.rowcount
-    if rows:
-        return {"deleted": rows}
-    else:
+    if rows < 0:
         raise HTTPException(status_code=404, detail="Not Oki Doki ID")
+
+    app.db_connection.commit()
+    return {"deleted": rows}
