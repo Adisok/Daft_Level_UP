@@ -259,7 +259,9 @@ async def get_products_by_id(product_id: int):
         WHERE Products.ProductID = {product_id} ORDER BY Orders.OrderID
     ''').fetchall()
 
-    if products_info != []:
+    if products_info == []:
+        raise HTTPException(status_code=404, detail="Wrong ID")
+    else:
         total_price = (products_info["unit_price"] * products_info["quantity"]) - \
                       (products_info["discount"] * (products_info["unit_price"] * products_info["quantity"]))
         ret_prod_info = [{"id": i["id"], "customer": i["customer"], "quantity": i["quantity"],
@@ -267,5 +269,4 @@ async def get_products_by_id(product_id: int):
         return {
             "orders": ret_prod_info
         }
-    else:
-        raise HTTPException(status_code=404, detail="Wrong ID")
+
