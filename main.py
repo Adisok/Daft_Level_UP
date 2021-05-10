@@ -323,7 +323,7 @@ def del_category(cat_id: int):
     )
 
     rows = cursor.rowcount
-    if rows < 0:
+    if rows < 1:
         raise HTTPException(status_code=404, detail="Not Oki Doki ID")
 
     app.db_connection.commit()
