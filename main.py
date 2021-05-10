@@ -235,9 +235,12 @@ async def get_emps(limit: Optional[int] = -1, offset: Optional[int] = 0, order: 
 async def get_products():
 
     products_info = app.db_connection.execute(
-        "SELECT Products.ProductID AS id, Products.ProductName AS name, Categories.CategoryName AS category, "
-        " Suppliers.CompanyName AS supplier FROM Products JOIN Categories ON Products.CategoryID = Categories.CategoryID "
-        "JOIN Suppliers ON Products.SupplierID = Suppliers.SupplierID ORDER BY Products.ProductsID"
+    """
+    SELECT Products.ProductID as id, Products.ProductName as name, 
+    Categories.CategoryName as category, Suppliers.CompanyName as supplier
+    FROM Products JOIN Categories ON Products.CategoryID = Categories.CategoryID 
+    Join Suppliers ON Products.SupplierID = Suppliers.SupplierID ORDER BY Products.ProductID
+    """
     ).fetchall()
 
     return {
