@@ -247,7 +247,7 @@ async def get_products():
     }
 
 
-@app.get("/products/{id}/orders")
+@app.get("/products/{product_id}/orders")
 async def get_products_by_id(product_id: int):
     product_info = app.db_connection.execute("""
         SELECT o.OrderId AS id, c.CompanyName AS customer, od.Quantity AS quantity,
