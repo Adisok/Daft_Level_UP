@@ -295,12 +295,11 @@ def add_category(category: Category):
 def put_category(category: Category, cat_id: int):
 
     cat_data = app.db_connection.execute(
-        "SELECT CategoryID as id, CategoryName as name"
-        "FROM Categories WHERE CustomerID = ?",
+        "SELECT CategoryID as id FROM Categories WHERE CategoryID = ?",
         (cat_id,)
     ).fetchone()
 
-    if cat_data != []:
+    if cat_data:
         cursor = app.db_connection.execute(
             "UPDATE Categories SET CategoryName = ? WHERE CategoryID = ?",
             (category.name, cat_id)
@@ -308,7 +307,7 @@ def put_category(category: Category, cat_id: int):
         app.db_connection.commit()
 
         cat_data = app.db_connection.execute(
-            "SELECT CategoryName AS name, CategoryID AS id FROM Categories Where CategoryID = ?",
+            "SELECT CategoryID AS id, CategoryName AS name FROM Categories WHERE CategoryID = ?",
             (cat_id,)
         ).fetchone()
         return cat_data
