@@ -317,8 +317,8 @@ async def del_category(cat_id: int):
         (cat_id,)
     )
     app.db_connection.commit()
-    rows = cursor.rowcount
-    if rows:
-        return {"deleted": rows}
+
+    if cursor.rowcount:
+        return {"deleted": 1}
     else:
         raise HTTPException(status_code=404, detail="Not Oki Doki ID")
