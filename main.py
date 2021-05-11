@@ -276,54 +276,46 @@ class Category(BaseModel):
     name: str
 
 @app.post("/categories", status_code=201)
-def add_category(category: Category):
+async def category_add(category: Category):
+    # category.name = new_remove(category.name)
     cursor = app.db_connection.execute(
         "INSERT INTO Categories (CategoryName) VALUES (?)", (category.name,)
     )
     app.db_connection.commit()
-    new_category_id = cursor.lastrowid
-
+    new_id = cursor.lastrowid
     app.db_connection.row_factory = sqlite3.Row
-    new_cat = app.db_connection.execute(
-        """SELECT CategoryID AS id, CategoryName AS name
-         FROM Categories WHERE CategoryID = ?""",
-        (new_category_id,)).fetchone()
+    category = app.db_connection.execute(
+        "SELECT CategoryId AS id, CategoryName AS name FROM categories WHERE CategoryId = ?", (new_id,)).fetchone()
+    return category
 
-    return new_cat
 
-@app.put("/categories/{cat_id}", status_code=200)
-def put_category(category: Category, cat_id: int):
-
-    cat_data = app.db_connection.execute(
-        "SELECT CategoryID as id FROM Categories WHERE CategoryID = ?",
-        (cat_id,)
+@app.put("/categories/{category_id}")
+async def category_update(category: Category, category_id: int):
+    id_exist = app.db_connection.execute(
+        "SELECT 1 FROM Categories WHERE CategoryId = ?", (category_id,)
     ).fetchone()
+    if not id_exist:
+        raise HTTPException(status_code=404, detail=f"Category id {category_id} doesn't exist")
 
-    if cat_data:
-        cursor = app.db_connection.execute(
-            "UPDATE Categories SET CategoryName = ? WHERE CategoryID = ?",
-            (category.name, cat_id)
-        )
-        app.db_connection.commit()
-
-        cat_data = app.db_connection.execute(
-            "SELECT CategoryID AS id, CategoryName AS name FROM Categories WHERE CategoryID = ?",
-            (cat_id,)
-        ).fetchone()
-        return cat_data
-    else:
-        raise HTTPException(status_code=404, detail="Not Oki Doki ID")
-
-@app.delete("/categories/{id}", status_code=200)
-def del_category(cat_id: int):
     cursor = app.db_connection.execute(
-        "DELETE FROM Categories WHERE CategoryID = ?",
-        (cat_id,)
+        "UPDATE Categories SET CategoryName = ? WHERE CategoryId = ?", (category.name, category_id)
     )
-
-    rows = cursor.rowcount
-    if rows < 1:
-        raise HTTPException(status_code=404, detail="Not Oki Doki ID")
-
     app.db_connection.commit()
-    return {"deleted": rows}
+    category = app.db_connection.execute(
+        "SELECT CategoryId AS id, CategoryName AS name FROM categories WHERE CategoryId = ?",
+        (category_id,)).fetchone()
+    return category
+
+
+@app.delete("/categories/{category_id}")
+async def category_delete(category_id: int):
+    id_exist = app.db_connection.execute(
+        "SELECT 1 FROM Categories WHERE CategoryId = ?", (category_id,)
+    ).fetchone()
+    if not id_exist:
+        raise HTTPException(status_code=404, detail=f"Category id {category_id} doesn't exist")
+    cursor = app.db_connection.execute(
+        "DELETE FROM Categories WHERE CategoryId = ?", (category_id,)
+    )
+    app.db_connection.commit()
+    return {"deleted": cursor.rowcount}
