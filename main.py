@@ -296,7 +296,7 @@ async def put_category(category: Category, cat_id: int):
 
     cursor = app.db_connection.execute(
         "UPDATE Categories SET CategoryName = ? WHERE CategoryID = ?",
-        (category.name, cat_id)
+        (category.name, cat_id, )
     )
     app.db_connection.commit()
     app.db_connection.row_factory = sqlite3.Row
