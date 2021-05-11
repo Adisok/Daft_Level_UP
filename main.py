@@ -276,46 +276,49 @@ class Category(BaseModel):
     name: str
 
 @app.post("/categories", status_code=201)
-async def category_add(category: Category):
-    category.name = " ".join([word for word in category.name.split(' ') if word.lower() != 'new'])
+async def add_category(category: Category):
     cursor = app.db_connection.execute(
         "INSERT INTO Categories (CategoryName) VALUES (?)", (category.name,)
     )
     app.db_connection.commit()
-    new_id = cursor.lastrowid
+    new_category_id = cursor.lastrowid
+
     app.db_connection.row_factory = sqlite3.Row
-    category = app.db_connection.execute(
-        "SELECT CategoryId AS id, CategoryName AS name FROM categories WHERE CategoryId = ?", (new_id,)).fetchone()
-    return category
+    new_cat = app.db_connection.execute(
+        """SELECT CategoryID AS id, CategoryName AS name
+         FROM Categories WHERE CategoryID = ?""",
+        (new_category_id,)).fetchone()
 
+    return new_cat
 
-@app.put("/categories/{category_id}")
-async def category_update(category: Category, category_id: int):
-    id_exist = app.db_connection.execute(
-        "SELECT 1 FROM Categories WHERE CategoryId = ?", (category_id,)
-    ).fetchone()
-    if not id_exist:
-        raise HTTPException(status_code=404, detail=f"Category id {category_id} doesn't exist")
-    category.name = " ".join([word for word in category.name.split(' ') if word.lower() != 'new'])
+@app.put("/categories/{cat_id}", status_code=200)
+async def put_category(category: Category, cat_id: int):
+
     cursor = app.db_connection.execute(
-        "UPDATE Categories SET CategoryName = ? WHERE CategoryId = ?", (category.name, category_id)
+        "UPDATE Categories SET CategoryName = ? WHERE CategoryID = ?",
+        (category.name, cat_id)
     )
     app.db_connection.commit()
-    category = app.db_connection.execute(
-        "SELECT CategoryId AS id, CategoryName AS name FROM categories WHERE CategoryId = ?",
-        (category_id,)).fetchone()
-    return category
+    app.db_connection.row_factory = sqlite3.Row
 
-
-@app.delete("/categories/{category_id}")
-async def category_delete(category_id: int):
-    id_exist = app.db_connection.execute(
-        "SELECT 1 FROM Categories WHERE CategoryId = ?", (category_id,)
+    cat_data = app.db_connection.execute(
+        "SELECT CategoryName AS name, CategoryID AS id FROM Categories WHERE CategoryID = ?",
+        (cat_id,)
     ).fetchone()
-    if not id_exist:
-        raise HTTPException(status_code=404, detail=f"Category id {category_id} doesn't exist")
+    if cat_data is None:
+        raise HTTPException(status_code=404, detail="Not Oki Doki ID")
+    return cat_data
+
+@app.delete("/categories/{id}", status_code=200)
+async def del_category(cat_id: int):
+
     cursor = app.db_connection.execute(
-        "DELETE FROM Categories WHERE CategoryId = ?", (category_id,)
+        "DELETE FROM Categories WHERE CategoryID = ?",
+        (cat_id,)
     )
     app.db_connection.commit()
-    return {"deleted": cursor.rowcount}
+    rows = cursor.rowcount
+    if rows:
+        return {"deleted": rows}
+    else:
+        raise HTTPException(status_code=404, detail="Not Oki Doki ID")
