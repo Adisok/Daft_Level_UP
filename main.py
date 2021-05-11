@@ -277,7 +277,7 @@ class Category(BaseModel):
 
 @app.post("/categories", status_code=201)
 async def category_add(category: Category):
-    # category.name = new_remove(category.name)
+    category.name = " ".join([word for word in category.name.split(' ') if word.lower() != 'new'])
     cursor = app.db_connection.execute(
         "INSERT INTO Categories (CategoryName) VALUES (?)", (category.name,)
     )
@@ -296,7 +296,7 @@ async def category_update(category: Category, category_id: int):
     ).fetchone()
     if not id_exist:
         raise HTTPException(status_code=404, detail=f"Category id {category_id} doesn't exist")
-
+    category.name = " ".join([word for word in category.name.split(' ') if word.lower() != 'new'])
     cursor = app.db_connection.execute(
         "UPDATE Categories SET CategoryName = ? WHERE CategoryId = ?", (category.name, category_id)
     )
