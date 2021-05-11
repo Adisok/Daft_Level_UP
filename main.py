@@ -310,15 +310,15 @@ async def put_category(category: Category, cat_id: int):
     return cat_data
 
 @app.delete("/categories/{id}", status_code=200)
-async def del_category(cat_id: int):
+async def del_category(id: int):
 
     cursor = app.db_connection.execute(
         "DELETE FROM Categories WHERE CategoryID = ?",
-        (cat_id,)
+        (id,)
     )
     app.db_connection.commit()
 
     if cursor.rowcount:
         return {"deleted": 1}
-    else:
-        raise HTTPException(status_code=404, detail="Not Oki Doki ID")
+    raise HTTPException(status_code=404, detail="Not Oki Doki ID")
+
