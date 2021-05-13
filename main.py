@@ -322,3 +322,6 @@ async def del_category(id: int):
         return {"deleted": 1}
     raise HTTPException(status_code=404, detail="Not Oki Doki ID")
 
+
+
+
