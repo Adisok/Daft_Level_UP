@@ -1,15 +1,21 @@
-from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header, Depends
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse
+import os
+import sqlite3
 import hashlib
-from datetime import datetime, timedelta, date
-from pydantic import BaseModel
-from typing import Optional, Dict
-from fastapi.templating import Jinja2Templates
 import secrets
 from random import randint
-import sqlite3
+from pydantic import BaseModel
+from typing import Optional, Dict
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime, timedelta, date
+from fastapi.templating import Jinja2Templates
+from views import router as northwind_api_router
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, RedirectResponse
+from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header, Depends
 
+
+SQLALCHEMY_DATABASE_URL = "postgresql://postgres:DaftAcademy@127.0.0.1:5555/postgres" #os.getenv("SQLALCHEMY_DATABASE_URL")
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -35,14 +41,20 @@ class PatientResp(BaseModel):
         return len(name_letters) + len(surname_letters)
 
 
+
 app = FastAPI()
 app.count_id: int = 1
 app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
 security = HTTPBasic()
 
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+app.include_router(northwind_api_router, tags=["northwind"])
+
 app.l_token = []
 app.s_token = []
+
 
 @app.get("/")
 def root():
@@ -322,6 +334,11 @@ async def del_category(id: int):
         return {"deleted": 1}
     raise HTTPException(status_code=404, detail="Not Oki Doki ID")
 
-
-
+#W5
+def get_db():
+    try:
+        db = SessionLocal()
+        yield db
+    finally:
+        db.close()
 
