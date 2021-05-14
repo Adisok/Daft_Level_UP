@@ -15,7 +15,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Red
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header, Depends
 
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:DaftAcademy@127.0.0.1:5555/postgres" #os.getenv("SQLALCHEMY_DATABASE_URL")
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 
 class PatientResp(BaseModel):
     id: Optional[int]
