@@ -24,9 +24,16 @@ def get_supplier(db: Session, supplier_id: int):
         db.query(models.Supplier).filter(models.Supplier.SupplierID == supplier_id).first()
     )
 
-def get_products(db: Session, id: int):
+
+def get_products(db: Session, id_sup: int):
     return db.query(models.Product.ProductID, models.Product.ProductName, models.Product.Discontinued,
                     models.Category.CategoryID, models.Category.CategoryName) \
             .join(models.Category, models.Product.CategoryID == models.Category.CategoryID) \
-            .filter(models.Product.SupplierID == id) \
+            .filter(models.Product.SupplierID == id_sup) \
             .order_by(models.Product.ProductID.desc()).all()
+
+
+def add_suppliers(db, supplier: models.Supplier()):
+    db.add(supplier)
+    db.commit()
+    pass

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import PositiveInt, ValidationError
 from sqlalchemy.orm import Session
 
-import crud, schemas
+import crud, schemas, models
 from database import get_db
 
 router = APIRouter()
@@ -51,3 +51,19 @@ async def get_sorted_supplier(id: PositiveInt, db: Session = Depends(get_db)):
     else:
         raise HTTPException(status_code=404, detail="Not Oki Doki ID!")
 
+@router.post("/suppliers", response_model=schemas.Supplier, status_code=201)
+async def add_supplier(add_supplier: schemas.AddSupplier, db: Session = Depends(get_db)):
+    supplier = models.Supplier()
+    supplier.CompanyName = add_supplier.CompanyName
+    supplier.ContactName = add_supplier.ContactName
+    supplier.ContactTitle = add_supplier.ContactTitle
+    supplier.Address = add_supplier.Address
+    supplier.City = add_supplier.City
+    supplier.PostalCode = add_supplier.PostalCode
+    supplier.Country = add_supplier.Country
+    supplier.Phone = add_supplier.Phone
+    supplier.Fax = add_supplier.Fax
+    supplier.HomePage = add_supplier.HomePage
+    crud.add_supplier(db, supplier)
+
+    return crud.get_supplier(db, supplier.SupplierID)
