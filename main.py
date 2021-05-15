@@ -15,7 +15,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Red
 from fastapi import FastAPI, Response, status, Query, Request, HTTPException, Cookie, Header, Depends
 
 
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
+#SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
 
 class PatientResp(BaseModel):
     id: Optional[int]
@@ -48,8 +48,8 @@ app.storage: Dict[int, PatientResp] = {}
 templates = Jinja2Templates(directory="templates")
 security = HTTPBasic()
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+#engine = create_engine(SQLALCHEMY_DATABASE_URL)
+#SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 app.include_router(northwind_api_router, tags=["northwind"])
 
 app.l_token = []
@@ -334,11 +334,5 @@ async def del_category(id: int):
         return {"deleted": 1}
     raise HTTPException(status_code=404, detail="Not Oki Doki ID")
 
-#W5
-def get_db():
-    try:
-        db = SessionLocal()
-        yield db
-    finally:
-        db.close()
+
 
