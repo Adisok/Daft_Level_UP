@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import PositiveInt, ValidationError
 from sqlalchemy.orm import Session
 
-import crud, schemas, models
+import crud
+import schemas
+import models
 from database import get_db
 
 router = APIRouter()
@@ -27,6 +29,7 @@ async def get_shippers(db: Session = Depends(get_db)):
 async def get_supplier(db: Session = Depends(get_db)):
     return crud.get_suppliers(db)
 
+
 @router.get("/suppliers/{supplier_id}", response_model=schemas.Supplier)
 async def get_supplier(supplier_id: PositiveInt, db: Session = Depends(get_db)):
     db_supplier = crud.get_supplier(db, supplier_id)
@@ -36,20 +39,21 @@ async def get_supplier(supplier_id: PositiveInt, db: Session = Depends(get_db)):
 
 
 @router.get("/suppliers/{id}/products")
-async def get_sorted_supplier(id: PositiveInt, db: Session = Depends(get_db)):
-    db_products = crud.get_products(db, id)
+async def get_sorted_supplier(pid: PositiveInt, db: Session = Depends(get_db)):
+    db_products = crud.get_products(db, pid)
     if db_products:
         data = [{"ProductID": prod.ProductID,
                  "ProductName": prod.ProductName,
                  "Category": {
                     "CategoryID": prod.CategoryID,
                     "CategoryName": prod.CategoryName,
-                },
+                            },
                 "Discontinued": prod.Discontinued}
                 for prod in db_products]
         return data
     else:
         raise HTTPException(status_code=404, detail="Not Oki Doki ID!")
+
 
 @router.post("/suppliers", response_model=schemas.Supplier, status_code=201)
 async def add_supplier(add_supplier: schemas.AddSupplier, db: Session = Depends(get_db)):
