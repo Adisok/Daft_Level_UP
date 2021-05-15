@@ -48,3 +48,6 @@ async def get_sorted_supplier(id: PositiveInt, db: Session = Depends(get_db)):
                 "Discontinued": prod.Discontinued}
                 for prod in db_products]
         return data
+    else:
+        raise HTTPException(status_code=404, detail="Not Oki Doki ID!")
+
