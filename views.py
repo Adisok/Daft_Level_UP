@@ -56,7 +56,7 @@ async def get_sorted_supplier(pid: PositiveInt, db: Session = Depends(get_db)):
 
 
 @router.post("/suppliers", response_model=schemas.Supplier, status_code=201)
-async def add_supplier(add_supplier: schemas.AddSupplier, db: Session = Depends(get_db)):
+async def add_supplier(add_supplier: schemas.Supplier, db: Session = Depends(get_db)):
     supplier = models.Supplier()
     supplier.CompanyName = add_supplier.CompanyName
     supplier.ContactName = add_supplier.ContactName
