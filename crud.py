@@ -33,7 +33,7 @@ def get_products(db: Session, id_sup: int):
             .order_by(models.Product.ProductID.desc()).all()
 
 
-def add_supplier(db, supplier: models.Supplier()):
+def add_supplier(db, supplier: models.Supplier):
     db.add(supplier)
     db.commit()
     pass
