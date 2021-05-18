@@ -21,7 +21,7 @@ class Suppliers(BaseModel):
 
 
 class Supplier(BaseModel):
-    SupplierID: typing.Optional[PositiveInt]
+    SupplierID: PositiveInt
     CompanyName: typing.Optional[str] = None
     ContactName: typing.Optional[str] = None
     ContactTitle: typing.Optional[str] = None
@@ -34,6 +34,21 @@ class Supplier(BaseModel):
     Fax: typing.Optional[str] = None
     HomePage: typing.Optional[str] = None
 
+
     class Config:
         orm_mode = True
 
+
+class AddSupplier(BaseModel):
+    CompanyName: constr(max_length=40)
+    ContactName: typing.Optional[str]
+    ContactTitle: typing.Optional[str]
+    Address: typing.Optional[str]
+    City: typing.Optional[str]
+    PostalCode: typing.Optional[str]
+    Country: typing.Optional[str]
+    Phone: typing.Optional[str]
+
+
+    class Config:
+        orm_mode = True

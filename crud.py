@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 import models
+import schemas
 
 
 def get_shippers(db: Session):
@@ -33,7 +34,20 @@ def get_products(db: Session, id_sup: int):
             .order_by(models.Product.ProductID.desc()).all()
 
 
-def add_supplier(db, supplier: models.Supplier):
-    db.add(supplier)
+def add_supplier(db: Session, supplier: schemas.AddSupplier):
+    supplier_id = db.query(models.Supplier).count() + 1
+    db_supplier = models.Supplier(
+        SupplierID=supplier_id,
+        CompanyName=supplier.CompanyName,
+        ContactName=supplier.ContactName,
+        ContactTitle=supplier.ContactTitle,
+        Address=supplier.Address,
+        City=supplier.City,
+        PostalCode=supplier.PostalCode,
+        Country=supplier.Country,
+        Phone=supplier.Phone
+    )
+    db.add(db_supplier)
     db.commit()
-    pass
+    db.refresh(db_supplier)
+    return db_supplier
