@@ -59,10 +59,9 @@ def upd_supp(db: Session, supplier: schemas.AddSupplier, sup_id: int):
     if new_vals:
         db.query(models.Supplier).filter(models.Supplier.SupplierID == sup_id).update(values=new_vals)
     db.commit()
-
     pass
 
 def del_supp(db: Session, sup_id: int):
     db.query(models.Supplier).filter(models.Supplier.SupplierID == sup_id).delete()
     db.commit()
-    pass
+

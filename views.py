@@ -73,4 +73,3 @@ async def update_supplier(sup_id: int, supp: schemas.Supplier, db: Session = Dep
 async def del_supplier(sup_id: int, db: Session = Depends(get_db)):
     db_supplier = check_for_supplier(db, sup_id)
     crud.del_supp(db, sup_id)
-    pass
