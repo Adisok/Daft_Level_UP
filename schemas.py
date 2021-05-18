@@ -21,7 +21,7 @@ class Suppliers(BaseModel):
 
 
 class Supplier(BaseModel):
-    SupplierID: PositiveInt
+    SupplierID: typing.Optional[PositiveInt]
     CompanyName: typing.Optional[str] = None
     ContactName: typing.Optional[str] = None
     ContactTitle: typing.Optional[str] = None
@@ -40,7 +40,7 @@ class Supplier(BaseModel):
 
 
 class AddSupplier(BaseModel):
-    CompanyName: constr(max_length=40)
+    CompanyName: typing.Optional[constr(max_length=40)]
     ContactName: typing.Optional[str]
     ContactTitle: typing.Optional[str]
     Address: typing.Optional[str]

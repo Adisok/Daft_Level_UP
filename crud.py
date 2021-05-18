@@ -54,7 +54,7 @@ def add_supplier(db: Session, supplier: schemas.AddSupplier):
     db.refresh(db_supplier)
     return db_supplier
 
-def upd_supp(db: Session, supplier: schemas.Supplier, sup_id: int):
+def upd_supp(db: Session, supplier: schemas.AddSupplier, sup_id: int):
     new_vals = {key: val for key,val in dict(supplier).items() if val is not None}
     if new_vals:
         db.query(models.Supplier).filter(models.Supplier.SupplierID == sup_id).update(values=new_vals)

@@ -63,7 +63,7 @@ async def get_sorted_supplier(pid: PositiveInt, db: Session = Depends(get_db)):
 async def add_supplier(supp: schemas.AddSupplier, db: Session = Depends(get_db)):
     return crud.add_supplier(db, supp)
 
-@router.put("/suppliers/{sup_id}", response_model= schemas.Supplier, status_code=200)
+@router.put("/suppliers/{sup_id}", response_model= schemas.AddSupplier, status_code=200)
 async def update_supplier(sup_id: int, supp: schemas.Supplier, db: Session = Depends(get_db)):
     db_supplier = check_for_supplier(db, sup_id)
     crud.upd_supp(db, supp, sup_id)
