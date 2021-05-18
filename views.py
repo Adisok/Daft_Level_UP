@@ -68,3 +68,9 @@ async def update_supplier(sup_id: int, supp: schemas.Supplier, db: Session = Dep
     db_supplier = check_for_supplier(db, sup_id)
     crud.upd_supp(db, supp, sup_id)
     return crud.get_supplier(db, sup_id)
+
+@router.delete("/suppliers/{sup_id}",status_code=204)
+async def del_supplier(sup_id: int, db: Session = Depends(get_db)):
+    db_supplier = check_for_supplier(db, sup_id)
+    crud.del_supp(db, sup_id)
+    pass
