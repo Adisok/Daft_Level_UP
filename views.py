@@ -67,3 +67,4 @@ async def add_supplier(supp: schemas.AddSupplier, db: Session = Depends(get_db))
 async def update_supplier(sup_id: int, supp: schemas.UpdateSupplier, db: Session = Depends(get_db)):
     db_supplier = check_for_supplier(db, sup_id)
     crud.upd_supp(db, supp, sup_id)
+    return get_db(db, sup_id)
