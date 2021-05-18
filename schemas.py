@@ -48,7 +48,8 @@ class AddSupplier(BaseModel):
     PostalCode: typing.Optional[str]
     Country: typing.Optional[str]
     Phone: typing.Optional[str]
-
+    Fax: typing.Optional[str]
+    HomePage: typing.Optional[str]
 
     class Config:
         orm_mode = True

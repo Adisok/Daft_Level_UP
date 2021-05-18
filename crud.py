@@ -45,7 +45,9 @@ def add_supplier(db: Session, supplier: schemas.AddSupplier):
         City=supplier.City,
         PostalCode=supplier.PostalCode,
         Country=supplier.Country,
-        Phone=supplier.Phone
+        Phone=supplier.Phone,
+        Fax=supplier.Fax,
+        HomePage=supplier.HomePage
     )
     db.add(db_supplier)
     db.commit()
