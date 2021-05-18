@@ -11,6 +11,12 @@ from database import get_db
 
 router = APIRouter()
 
+def check_for_supplier(db, supp_id):
+    is_supp = crud.get_supplier(db, supp_id)
+    if is_supp is None:
+        raise HTTPException(status_code=404, detail="Not Okie Dokie ID")
+    return is_supp
+
 
 @router.get("/shippers/{shipper_id}", response_model=schemas.Shipper)
 async def get_shipper(shipper_id: PositiveInt, db: Session = Depends(get_db)):
@@ -32,9 +38,7 @@ async def get_supplier(db: Session = Depends(get_db)):
 
 @router.get("/suppliers/{supplier_id}", response_model=schemas.Supplier)
 async def get_supplier(supplier_id: PositiveInt, db: Session = Depends(get_db)):
-    db_supplier = crud.get_supplier(db, supplier_id)
-    if db_supplier is None:
-        raise HTTPException(status_code=404, detail="Not Okie Dokie ID")
+    db_supplier = check_for_supplier(db, supplier_id)
     return db_supplier
 
 
@@ -58,3 +62,8 @@ async def get_sorted_supplier(pid: PositiveInt, db: Session = Depends(get_db)):
 @router.post("/suppliers", response_model=schemas.Supplier, status_code=201)
 async def add_supplier(supp: schemas.AddSupplier, db: Session = Depends(get_db)):
     return crud.add_supplier(db, supp)
+
+@router.put("/suppliers/{sup_id}", response_model= schemas.Supplier, status_code=200)
+async def update_supplier(sup_id: int, supp: schemas.UpdateSupplier, db: Session = Depends(get_db)):
+    db_supplier = check_for_supplier(db, sup_id)
+    crud.upd_supp(db, supp, sup_id)
