@@ -64,4 +64,5 @@ def upd_supp(db: Session, supplier: schemas.AddSupplier, sup_id: int):
 def del_supp(db: Session, sup_id: int):
     db.query(models.Supplier).filter(models.Supplier.SupplierID == sup_id).delete()
     db.commit()
+    return
 
