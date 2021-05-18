@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import PositiveInt, ValidationError
 from sqlalchemy.orm import Session
+from fastapi.responses import Response
 
 import crud
 import schemas
@@ -69,7 +70,8 @@ async def update_supplier(sup_id: int, supp: schemas.Supplier, db: Session = Dep
     crud.upd_supp(db, supp, sup_id)
     return crud.get_supplier(db, sup_id)
 
-@router.delete("/suppliers/{sup_id}",status_code=204)
+@router.delete("/suppliers/{sup_id}")
 async def del_supplier(sup_id: int, db: Session = Depends(get_db)):
     db_supplier = check_for_supplier(db, sup_id)
     crud.del_supp(db, sup_id)
+    return Response(status_code=204)
